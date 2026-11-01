@@ -116,6 +116,9 @@ r_0 \leq \frac{gn}{8}\min\left\{2H,\frac{3}{32g^2}\right\}.
 
 ## 4. Why this is useful, and what it does not establish
 
+**Critical scope limitation:** (KL-1) is not, by itself, an adaptation-cost lower bound. It compares a baseline and one-change environment where the policy is not told the improved arm or the change time, but the policy could still be given the numerical budgets Q and B. Thus the inequality can hold even for a supplied-budget oracle policy. It is an information-theoretic positive-noise ingredient, not evidence that hiding Q and B creates an extra penalty. To establish the project’s main target, this lemma must be combined with at least one additional environment family / budget pair and a simultaneous-policy argument that separates prior-free policies from supplied-budget oracle policies.
+
+
 - It supplies a transparent positive-noise environment with Q=T/4 and B=2g.
 - It exposes the information cost of discovering one arm whose mean improves after a hidden change.
 - It is a candidate lower-bound ingredient for the unknown-(Q,B) adaptation profile.
