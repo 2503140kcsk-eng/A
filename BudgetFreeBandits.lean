@@ -3,4 +3,3 @@ module
 public import BudgetFreeBandits.AdaptationFrontier
 public import BudgetFreeBandits.PositiveNoiseAdaptation
 public import BudgetFreeBandits.PositiveNoisePMF
-public import BudgetFreeBandits.SequentialKL
