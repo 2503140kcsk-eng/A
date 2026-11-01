@@ -1,8 +1,6 @@
 module
 
 public import BudgetFreeBandits.PositiveNoisePMF
-public import Mathlib.MeasureTheory.Measure.Decomposition.RadOnNikodym
-public import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
 
 /-!
 # Measure-theoretic KL for the concrete finite PMFs
