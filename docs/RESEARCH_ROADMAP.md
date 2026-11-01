@@ -104,7 +104,7 @@ A restricted but nontrivial family-level problem has now been isolated in docs/P
 - [ ] Specialize the generic chain rule to the point-spike family and prove the local KL equals `log(5/3)` times the baseline probability of selecting the changed arm.
 - [ ] Kernel-check the path-counting/Jensen lower bound.
 - [ ] Kernel-check the full oracle-competitive reduction, not only its final scalar product-bound corollary.
-- [x] Obtain a clean green pinned-toolchain CI run for the new Lean module (run 41284538301; exact scope recorded in PROGRESS_LOG.md).
+- [x] Obtain clean green pinned-toolchain CI runs for the current four-module Lean library (runs 41300592276 and 41300588286; exact scope recorded in PROGRESS_LOG.md).
 
 Acceptance: the restricted-family theorem is separately labelled from the general problem; the generic sequential KL chain rule and all other formal claims have successful pinned CI evidence; point-spike local-KL specialization, path-counting, and regret statements remain labelled as written mathematics until formalized.
 
