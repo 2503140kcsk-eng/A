@@ -84,3 +84,31 @@ f'(x)=-\frac{(q-x)(2+q+x)}{(1+x)^2}.
 Consequently \(f\) is convex and nonincreasing on \(0\le x\le q\), the two properties used in the Jensen step of the positive-noise lower-bound proof.
 
 **Evidence limit:** these symbolic checks verify the displayed scalar expressions and inequalities only. They do not verify the coupling argument, the pathwise gap count, the adaptive finite-history KL induction, the algorithm's regret analysis, or novelty. Those mathematical steps are documented separately and retain their own proof/verification status.
+
+
+## Check 5 — non-degenerate separated-signal extension
+
+For baseline \(P_T\) on \(3/8\pm s_T\), signal law \(R\) on \(\{3/4,7/8\}\) with equal mass, and
+\[
+\widetilde Q_T=\frac37P_T+\frac47R,
+\]
+Wolfram simplification gives
+\[
+\mathbb E_{\widetilde Q_T}[X]=\frac58,\qquad
+\operatorname{Var}(\widetilde Q_T)=\frac{11}{224}+\frac37s_T^2.
+\]
+The exactly separated signal event \(S=\{3/4,7/8\}\) has probability \(4/7\) after the change and zero before the change. Therefore
+\[
+D_{\rm KL}(P_T\Vert\widetilde Q_T)=\log(7/3).
+\]
+This removes the deterministic marker while retaining a perfectly observable signal event. It does not remove the support-separation assumption.
+
+## Check 6 — exact independent finite regression checks
+
+The repository script scripts/independent_checks.py uses only Python's standard library and fractions.Fraction:
+
+- 200 randomly generated nonanticipating action kernels depending on complete histories, with horizons 1–5; for every baseline transcript, the exact likelihood ratio equalled \((5/3)^{N_a}\).
+- 2,046 pull-time subsets for the gap-counting and Cauchy–Schwarz inequalities with \(q\le10\).
+- 13,231 exact rational \((T,\tau)\) pairs checking the point-spike and separated-signal variance-budget envelopes, for \(64\le T\le240\).
+
+The local run passed. The same command is now placed before the Lean build in .github/workflows/lean.yml; the Actions result is the reproducible CI check. These finite tests are regression checks only, not proofs for all policies or horizons.
