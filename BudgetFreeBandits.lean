@@ -1,1 +1,3 @@
-import BudgetFreeBandits.AdaptationFrontier
+module
+
+public import BudgetFreeBandits.AdaptationFrontier
