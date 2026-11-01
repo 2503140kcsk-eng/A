@@ -123,7 +123,7 @@ D_{\rm KL}(\mathbb P_0^T\Vert\mathbb P_{a,\tau}^T)
 =\log\frac73\;\mathbb E_0[N_a(\tau,T)].
 }
 \]
-Here \(N_a(\tau,T)\) is the number of selections of arm \(a\) from \(\tau\) through \(T\), and \(\mathbb P^T\) is the law of the entire observed action/reward history. The one-round Mathlib adapters already present in the repository establish the local chain-rule step; the explicit recursive finite-history model and induction remain a separate Lean task.
+Here \(N_a(\tau,T)\) is the number of selections of arm \(a\) from \(\tau\) through \(T\), and \(\mathbb P^T\) is the law of the entire observed action/reward history. The one-round Mathlib adapters establish the local chain-rule step, and `BudgetFreeBandits/SequentialKL.lean` now kernel-checks the generic recursive finite-history KL chain rule. What remains unformalized for this separated-signal construction is its concrete joint-kernel instantiation and the reduction of each local KL to `log(7/3)` times the baseline probability of selecting the changed arm.
 
 ## 5. Coupling, gap counting, and the lower bound
 
@@ -226,7 +226,8 @@ It does not remove the separability promise. For overlapping supports, the signa
 - The non-degenerate two-point signal PMF and this generalized separated-support theorem are not yet Lean-checked.
 - Exact arithmetic is suitable for SymPy/Wolfram verification.
 - SageMath, cvc5, and GAP are assigned finite-policy enumeration, SMT counterexample search, and symmetry reduction respectively; they are not reported as executed unless a corresponding run log is committed.
-- The formal finite-history induction, gap-sum/Jensen proof, and complete algorithm expected-regret theorem remain separate Lean obligations.
+- The generic finite-history KL induction is now formalized in `BudgetFreeBandits/SequentialKL.lean`; its specialization to this signal distribution and the local-KL identity `log(7/3)` times pull probability remain unformalized.
+- The gap-sum/Jensen proof and complete algorithm expected-regret theorem remain separate Lean obligations.
 
 
 ## 9. Novelty audit against the October 2026 literature
