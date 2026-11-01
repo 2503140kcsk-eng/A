@@ -13,9 +13,9 @@ moment/KL calculations for the spike construction, and the final algebraic
 competitive-ratio reduction from the stated frontier inequality.
 -/
 
-namespace BudgetFreeBandits
-
 noncomputable section
+
+namespace BudgetFreeBandits
 
 open MeasureTheory ProbabilityTheory
 
@@ -112,7 +112,6 @@ theorem spike_alternative_budget_bounds
     unfold spikeNoiseVariance
     positivity
   have hbase_le : spikeNoiseVariance T ≤ 1 / 8 := by
-    have hvar := spike_alternative_variance_upper hT
     have hbase_eq : spikeNoiseVariance T ≤
         spikeAlternativeVariance (spikeNoiseVariance T) := by
       unfold spikeNoiseVariance
