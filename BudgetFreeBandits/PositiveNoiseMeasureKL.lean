@@ -1,7 +1,7 @@
 module
 
 public import BudgetFreeBandits.PositiveNoisePMF
-public import Mathlib.MeasureTheory.Measure.Decomposition.RadONNikodym
+public import Mathlib.MeasureTheory.Measure.Decomposition.RadOnNikodym
 public import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
 
 /-!
