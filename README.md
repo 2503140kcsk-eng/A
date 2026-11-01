@@ -36,17 +36,17 @@ The pinned Lean/Mathlib build passed with `--wfail` in [GitHub Actions run 41281
 
 ## Positive-noise adaptation milestone (restricted family)
 
-`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md` develops a two-class construction in which **every arm and every round has strictly positive reward variance**. The stationary class has (Q_0=1/4096>0, B=0); the one-change class has (3T/64\le Q\le T/8) and (B=1/4). The exact one-observation KL term is \\(\log(5/3)\\).
+\`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md\` develops a two-class construction in which **every arm and every round has strictly positive reward variance**. The stationary class has \(Q_0=1/4096>0,\ B=0\); the one-change class has \(3T/64\le Q\le T/8\) and \(B=1/4\). The exact one-observation KL term is \(\log(5/3)\).
 
 For this disclosed finite family, a gap-counting lower bound and a budget-unaware probe-and-commit policy give the same restricted-family oracle-competitive order:
-\\[
-\\inf_{\\pi\ \text{not told }Q,B}\\sup_{\\nu\in\\mathcal F}
-\\frac{\\mathbb E_\\nu[R_T]}{\\Xi(A,T;Q(\\nu),B(\\nu))}
-=\\Theta\\bigl((T/A)^{1/6}\\bigr).
-\\]
+\[
+\inf_{\pi\text{ not told }Q,B}\sup_{\nu\in\mathcal F}
+\frac{\mathbb E_\nu[R_T]}{\Xi(A,T;Q(\nu),B(\nu))}
+=\Theta\bigl((T/A)^{1/6}\bigr).
+\]
 This is a genuine positive-noise adaptation obstruction, **but it is not the unrestricted two-dimensional Pareto frontier**. The policy upper bound uses the disclosed spike-family structure. The finite-history KL induction, gap-counting lemma, and algorithm regret calculation remain written proofs and are not yet kernel-checked end-to-end.
 
-`BudgetFreeBandits/PositiveNoiseAdaptation.lean` formalizes the exact moments/budgets/KL scalar, Mathlib's adaptive action-kernel cancellation and one-round KL decomposition, and an algebraic competitive-ratio reduction from the lower-frontier hypothesis. It does not yet formalize the complete finite-horizon induction or the path-counting lemma.
+\`BudgetFreeBandits/PositiveNoiseAdaptation.lean\` formalizes the exact moments/budgets/KL scalar, Mathlib's adaptive action-kernel cancellation and one-round KL decomposition, and an algebraic competitive-ratio reduction from the lower-frontier hypothesis. It does not yet formalize the complete finite-horizon induction or the path-counting lemma.
 
 The earlier Bernoulli construction remains in [docs/NOISY_LOWER_BOUND_CANDIDATE.md](docs/NOISY_LOWER_BOUND_CANDIDATE.md) as a separate information-theoretic candidate; it is not the current main adaptation construction. Exact symbolic checks and limitations are recorded in [docs/EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md).
 
