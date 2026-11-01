@@ -56,14 +56,15 @@ theorem spikeBase_toMeasure_eq_withDensity :
   intro s hs
   rw [withDensity_apply spikeDensity hs, ← lintegral_indicator hs, lintegral_fintype]
   rw [PMF.toMeasure_apply spikeBasePMF hs]
-  simp only [PMF.toMeasure_apply_singleton spikeAlternativePMF]
+  simp only [Measure.restrict_apply (MeasurableSet.singleton _)]
   by_cases h0 : (0 : Fin 3) ∈ s
   · by_cases h1 : (1 : Fin 3) ∈ s <;>
       simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
         spikeBasePMF, spikeAlternativePMF, h0, h1, Fin.sum_univ_succ,
-        tsum_fintype]
+        tsum_fintype, PMF.toMeasure_apply_singleton]
   · simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
-      spikeBasePMF, spikeAlternativePMF, h0, Fin.sum_univ_succ, tsum_fintype]
+      spikeBasePMF, spikeAlternativePMF, h0, Fin.sum_univ_succ, tsum_fintype,
+      PMF.toMeasure_apply_singleton]
 
 /-- The baseline measure is absolutely continuous with respect to the alternative. -/
 theorem spikeBase_toMeasure_absolutelyContinuous :
@@ -126,15 +127,17 @@ theorem spike_measure_kl_exact :
               (by norm_num : (0 : ℝ) ≤ 5 / 3)
             norm_num [InformationTheory.klFun] at h
             nlinarith
+          have hx : 0 ≤ (5 / 3 : ℝ) := by norm_num
+          rw [ENNReal.toReal_ofReal hx]
           have hcoef :
               (3 : ℝ≥0∞) / 10 = ENNReal.ofReal ((3 : ℝ) / 10) := by
-            norm_num
+            norm_num [ENNReal.ofReal_eq_coe_nnreal]
           have htwo : (2 : ℝ≥0∞) = ENNReal.ofReal (2 : ℝ) := by
             norm_num
           have hmark :
               (2 : ℝ≥0∞) / 5 = ENNReal.ofReal ((2 : ℝ) / 5) := by
-            norm_num
-          rw [hcoef, htwo, hmark, ← ENNReal.ofReal_mul hA,
+            norm_num [ENNReal.ofReal_eq_coe_nnreal]
+          rw [hcoef, hmark, htwo, ← ENNReal.ofReal_mul hA,
             ← ENNReal.ofReal_mul (mul_nonneg hA (by norm_num : (0 : ℝ) ≤ 3 / 10)),
             ← ENNReal.ofReal_add
               (mul_nonneg (mul_nonneg hA (by norm_num : (0 : ℝ) ≤ 3 / 10))
