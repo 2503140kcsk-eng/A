@@ -37,7 +37,6 @@ theorem theorem_5_1_algebraic_corollary
     {g n q u r0 r1 : ℝ}
     (hg : 0 < g)
     (hn : 0 < n)
-    (hq : 0 < q)
     (hu : 4 ≤ u)
     (hu_sq : u ^ 2 = n * q)
     (hn_le_u : n ≤ u)
