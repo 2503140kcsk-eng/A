@@ -89,3 +89,24 @@ Revise the target if a prior paper proves the exact profile under the same feedb
 ## Current status
 
 The repository contains the literature-scoped target, a formalized algebraic consequence of a published lower bound, and a candidate positive-noise lower-bound direction. The unrestricted noisy adaptation problem remains **OPEN / NOT SOLVED**.
+
+
+## Intermediate milestone — positive-noise two-class separation
+
+A restricted but nontrivial family-level problem has now been isolated in docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md.
+
+- [x] Construct a low positive-variance stationary class and a high positive-variance one-change class.
+- [x] Compute exact means, variances, budgets, and one-step KL.
+- [x] Derive the adaptive action-kernel cancellation from pinned Mathlib KL chain-rule declarations.
+- [x] Give a path-counting coupling lower-bound proof on the disclosed family.
+- [x] Design a family-specific budget-unaware probe-and-commit policy and derive the \((T/A)^{1/6}\) competitive order.
+- [ ] Kernel-check the complete finite-horizon transcript induction.
+- [ ] Kernel-check the path-counting/Jensen lower bound.
+- [ ] Kernel-check the full oracle-competitive reduction, not only its final scalar product-bound corollary.
+- [ ] Obtain a clean green pinned-toolchain CI run for the new Lean module.
+
+Acceptance: the restricted-family theorem is separately labelled from the general problem, and every Lean status is supported by a successful CI run.
+
+## Remaining general problem
+
+The main milestone 4–6 remains open: remove the disclosed spike-family promise, handle all bounded independent-round selected-arm environments with simultaneous unknown \(Q,B\), and characterize the full one-policy Pareto profile. A restricted-family tight rate cannot be promoted to a full-model optimal adaptation boundary.
