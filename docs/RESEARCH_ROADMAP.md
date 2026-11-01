@@ -12,7 +12,7 @@ A complete result may be positive or negative. Do not force an algorithmic succe
 - [x] Give the project a formal title in README.
 - [x] Pin Lean/Mathlib toolchain.
 - [x] Add CI build workflow.
-- [ ] Obtain and inspect a successful GitHub Actions result.
+- [x] Obtain and inspect successful GitHub Actions results on the current source head.
 - [x] Record target paper open-question scope and prior-work guardrails.
 
 Acceptance: every theorem claim has a source or checked proof; CI result is linked rather than assumed.
@@ -21,7 +21,7 @@ Acceptance: every theorem claim has a source or checked proof; CI result is link
 
 - [x] Transcribe the two inequalities in Theorem 5.1 into explicit Lean assumptions.
 - [x] Prove r1 >= gu/12 from u^2=nq, u>=4, n<=u.
-- [ ] Obtain a green pinned-toolchain CI run with no warnings.
+- [x] Obtain green pinned-toolchain CI runs with `--wfail` (runs 41300592276 and 41300588286).
 - [ ] Add conversion to the paper's Omega(g*sqrt(nT)) form, recording exact T>=2 condition and constant.
 - [ ] Audit Lean assumptions against Theorem 5.1 line by line.
 
@@ -100,12 +100,13 @@ A restricted but nontrivial family-level problem has now been isolated in docs/P
 - [x] Derive the adaptive action-kernel cancellation from pinned Mathlib KL chain-rule declarations.
 - [x] Give a path-counting coupling lower-bound proof on the disclosed family.
 - [x] Design a family-specific budget-unaware probe-and-commit policy and derive the \((T/A)^{1/6}\) competitive order.
-- [ ] Kernel-check the complete finite-horizon transcript induction.
+- [x] Kernel-check the generic finite-horizon transcript KL chain rule for arbitrary history-dependent Markov transition kernels (`BudgetFreeBandits/SequentialKL.lean`).
+- [ ] Specialize the generic chain rule to the point-spike family and prove the local KL equals `log(5/3)` times the baseline probability of selecting the changed arm.
 - [ ] Kernel-check the path-counting/Jensen lower bound.
 - [ ] Kernel-check the full oracle-competitive reduction, not only its final scalar product-bound corollary.
 - [x] Obtain a clean green pinned-toolchain CI run for the new Lean module (run 41284538301; exact scope recorded in PROGRESS_LOG.md).
 
-Acceptance: the restricted-family theorem is separately labelled from the general problem, and every Lean status is supported by a successful CI run.
+Acceptance: the restricted-family theorem is separately labelled from the general problem; the generic sequential KL chain rule and all other formal claims have successful pinned CI evidence; point-spike local-KL specialization, path-counting, and regret statements remain labelled as written mathematics until formalized.
 
 ## Remaining general problem
 
