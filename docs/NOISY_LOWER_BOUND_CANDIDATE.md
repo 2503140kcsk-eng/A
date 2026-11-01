@@ -138,3 +138,8 @@ It does **not**:
 - Check the Pinsker and bounded-statistic total-variation constants.
 - Search for an existing lower bound with the same one-improving-arm Bernoulli construction.
 - Formalize the finite Bernoulli model and KL algebra in Lean before claiming a theorem.
+
+
+## Status update — superseded as the principal adaptation construction
+
+This Bernoulli construction remains a valid candidate for an information-theoretic exploration inequality, but it does not isolate the cost of not knowing the numerical budgets. The current positive-noise adaptation construction is docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md: it uses two environment classes with different strictly positive variance budgets and an identifiable spike coupling, and it includes a family-level matching budget-unaware policy. The Bernoulli note is retained for comparison rather than presented as the main theorem.
