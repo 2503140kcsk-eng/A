@@ -144,3 +144,8 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 - **Not kernel-verified:** equality of the discrete PMF KL with Mathlib's measure-level `InformationTheory.klDiv`; arbitrary-history finite-horizon KL induction; the path-counting lower proof; the family-specific policy expected-regret theorem; and the final restricted-family oracle ratio proof.
 - **Research status:** the point-spike restricted-family upper/lower result and the non-degenerate support-separated extension remain written mathematical arguments. The latter is not formalized in Lean. Neither is a solution to the unrestricted unknown-`(Q,B)` problem; publication-level novelty remains unverified.
 - PR #2 remains Draft and must not be merged as a complete formal solution.
+### Latest current-head CI result
+
+- The current PR head at the time of this update is `a16ee752b4fd5b66a22af33a78941b1efab6faed`.
+- [GitHub Actions run 41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148) completed with conclusion **success**. Its exact independent finite checks and pinned Lean/Mathlib `--wfail` build both passed.
+- Compared with source-cleanup commit `8d77702299c2c46fe3cd33b2e517efcc34d8b0d6`, the four intervening commits modify only README and research documentation. No Lean, Lake, toolchain, script, or workflow source changed.
