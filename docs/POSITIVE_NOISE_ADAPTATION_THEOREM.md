@@ -25,7 +25,7 @@ Q_T=(1-\varepsilon)P_T+\varepsilon\delta_1.
 
 The learner knows the family and its constants \(A,T,g,\varepsilon,s_T\), but is not told whether a change occurs, which arm changes, or when. It uses one fixed nonanticipating randomized policy. Rewards are independent across rounds, and the environment is fixed before interaction.
 
-All points in the support of \(P_T,C_T\) are strictly below 1. Therefore, observing reward 1 on a challenger is an unambiguous certificate that it is the changed arm.
+Since \(T\ge32A\ge64\), we have \(s_T\le1/512\). Thus all four two-point support locations lie strictly inside \([0,1)\), and every baseline arm has positive variance \(s_T^2\). Observing reward 1 on a challenger is therefore an unambiguous certificate that it is the changed arm.
 
 ## 2. Moments, budgets, and one-step KL
 
