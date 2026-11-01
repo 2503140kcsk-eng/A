@@ -24,6 +24,7 @@ namespace BudgetFreeBandits
 universe uA uX
 
 /-- Full observed history before round t: all previous action/reward pairs. -/
+@[instance_reducible]
 def SequentialHistory (A : Type uA) (X : Type uX) :
     Nat → Type (max uA uX)
   | 0 => PUnit
@@ -31,22 +32,6 @@ def SequentialHistory (A : Type uA) (X : Type uX) :
 
 variable {A : Type uA} {X : Type uX}
   [MeasurableSpace A] [MeasurableSpace X]
-
-/-- The recursively chosen product measurable space on every finite-history type. -/
-@[instance_reducible]
-def sequentialHistoryMeasurableSpace (t : Nat) :
-    MeasurableSpace (SequentialHistory A X t) :=
-  match t with
-  | 0 => PUnit.instMeasurableSpace
-  | t + 1 =>
-      MeasurableSpace.prod
-        (sequentialHistoryMeasurableSpace t)
-        (MeasurableSpace.prod ‹MeasurableSpace A› ‹MeasurableSpace X›)
-
-@[instance_reducible]
-instance sequentialHistoryMeasurableSpaceInstance (t : Nat) :
-    MeasurableSpace (SequentialHistory A X t) :=
-  sequentialHistoryMeasurableSpace (A := A) (X := X) t
 
 /-- Joint transition law for the next action and reward, given the complete past. -/
 abbrev SequentialStep (t : Nat) :=
@@ -69,7 +54,7 @@ theorem sequentialTranscript_isProbability
   intro t
   induction t with
   | zero =>
-      simpa [sequentialTranscript, sequentialHistoryMeasurableSpace] using
+      simpa [sequentialTranscript] using
         (inferInstance : IsProbabilityMeasure (Measure.dirac PUnit.unit))
   | succ t ih =>
       haveI : IsProbabilityMeasure (sequentialTranscript step hStep t) := ih
