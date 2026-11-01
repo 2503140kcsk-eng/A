@@ -10,6 +10,7 @@ on:
       - "lakefile.lean"
       - "lake-manifest.json"
       - "lean-toolchain"
+      - "scripts/*.py"
       - ".github/workflows/lean.yml"
   pull_request:
     branches:
@@ -32,6 +33,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Run exact independent finite checks
+        run: python3 scripts/independent_checks.py
 
       - name: Install Lean and build Mathlib project
         uses: leanprover/lean-action@v1
