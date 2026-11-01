@@ -9,19 +9,18 @@ from itertools import combinations
 from random import Random
 
 
-def transcript_pmf(horizon: int, change_at: int, seed: int, alternative: bool):
-    """Enumerate the transcript PMF for a fully history-dependent policy.
-
-    Arm 0 is stable. Arm 1 is the potentially improved target.
-    The same randomized action kernel is shared by both environments.
-    """
-    rng = Random(seed)
-    policy_probabilities = {}
-
+def transcript_pmf(
+    horizon: int,
+    change_at: int,
+    alternative: bool,
+    policy_probabilities,
+    policy_rng,
+):
+    """Enumerate a transcript PMF using the shared history-dependent policy."""
     def policy_target_probability(t, history):
         key = (t, history)
         if key not in policy_probabilities:
-            policy_probabilities[key] = F(rng.randrange(1, 10), 10)
+            policy_probabilities[key] = F(policy_rng.randrange(1, 10), 10)
         return policy_probabilities[key]
 
     distribution = {(): F(1)}
@@ -54,9 +53,16 @@ def check_adaptive_kl(trials: int = 200) -> tuple[int, int]:
     for _ in range(trials):
         horizon = seed_rng.randrange(1, 6)
         change_at = seed_rng.randrange(0, horizon)
-        seed = seed_rng.randrange(1, 10**9)
-        baseline = transcript_pmf(horizon, change_at, seed, False)
-        alternative = transcript_pmf(horizon, change_at, seed, True)
+        policy_rng = Random(seed_rng.randrange(1, 10**9))
+        # One shared policy table is essential: the learner's conditional
+        # action distribution must be identical in both environments.
+        policy_probabilities = {}
+        baseline = transcript_pmf(
+            horizon, change_at, False, policy_probabilities, policy_rng
+        )
+        alternative = transcript_pmf(
+            horizon, change_at, True, policy_probabilities, policy_rng
+        )
         assert sum(baseline.values()) == 1
         assert sum(alternative.values()) == 1
 
