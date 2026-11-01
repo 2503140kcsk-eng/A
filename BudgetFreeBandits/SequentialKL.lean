@@ -4,11 +4,12 @@ public import Mathlib
 public import Mathlib.InformationTheory.KullbackLeibler.ChainRule
 
 /-!
-# Finite-horizon KL chain rule for fully history-adaptive policies
+# Finite-horizon KL chain rule for adaptive sequential experiments
 
-The policy at round t is an arbitrary Markov kernel from the complete
-previous transcript to the next action.  Thus this theorem does not impose
-stationarity or a non-adaptive action schedule.
+Each one-round transition kernel is a joint law of the next action and reward,
+conditional on the complete past.  It may therefore encode an arbitrary
+history-dependent randomized policy.  The theorem below is the finite
+iteration of Mathlib's composition-product KL chain rule.
 -/
 
 noncomputable section
@@ -18,141 +19,99 @@ open scoped ProbabilityTheory ENNReal
 
 namespace BudgetFreeBandits
 
-/-- Full observed history before round t: all previous actions and rewards. -/
 universe uA uX
 
-def SequentialHistory (A : Type uA) (X : Type uX) : Nat → Type (max uA uX)
+/-- Full observed history before round t: all previous action/reward pairs. -/
+def SequentialHistory (A : Type uA) (X : Type uX) :
+    Nat → Type (max uA uX)
   | 0 => PUnit
   | t + 1 => SequentialHistory A X t × (A × X)
 
-variable {A X : Type*} [MeasurableSpace A] [MeasurableSpace X]
+variable {A : Type uA} {X : Type uX}
+  [MeasurableSpace A] [MeasurableSpace X]
 
-/-- The recursive finite-history space carries the product measurable space. -/
+/-- Product measurable space on every finite-history type. -/
 instance sequentialHistoryMeasurableSpace (t : Nat) :
     MeasurableSpace (SequentialHistory A X t) := by
   induction t with
-  | zero => exact ⊤
+  | zero => exact PUnit.instMeasurableSpace
   | succ t ih =>
       letI : MeasurableSpace (SequentialHistory A X t) := ih
       infer_instance
 
-/-- One-round joint action/reward kernel, allowing the action law to depend
-on the complete current history. -/
-noncomputable def sequentialStepKernel
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (reward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hReward : ∀ t, IsMarkovKernel (reward t))
-    (t : Nat) : Kernel (SequentialHistory A X t) (A × X) := by
-  letI : IsMarkovKernel (policy t) := hPolicy t
-  letI : IsMarkovKernel (reward t) := hReward t
-  exact policy t ⊗ₖ reward t
+/-- Joint transition law for the next action and reward, given the complete past. -/
+abbrev SequentialStep (t : Nat) :=
+  Kernel (SequentialHistory A X t) (A × X)
 
-theorem sequentialStepKernel_isMarkov
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (reward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hReward : ∀ t, IsMarkovKernel (reward t))
-    (t : Nat) :
-    IsMarkovKernel (sequentialStepKernel policy reward hPolicy hReward t) := by
-  dsimp [sequentialStepKernel]
-  letI : IsMarkovKernel (policy t) := hPolicy t
-  letI : IsMarkovKernel (reward t) := hReward t
-  infer_instance
-
-/-- Law of the complete action/reward transcript through t rounds. -/
+/-- The law of the complete action/reward transcript after t rounds. -/
 noncomputable def sequentialTranscript
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (reward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hReward : ∀ t, IsMarkovKernel (reward t)) :
+    (step : (t : Nat) → SequentialStep (A := A) (X := X) t)
+    (hStep : ∀ t, IsMarkovKernel (step t)) :
     (t : Nat) → Measure (SequentialHistory A X t)
   | 0 => Measure.dirac PUnit.unit
   | t + 1 =>
-      letI : IsMarkovKernel (sequentialStepKernel policy reward hPolicy hReward t) :=
-        sequentialStepKernel_isMarkov policy reward hPolicy hReward t
-      sequentialTranscript policy reward hPolicy hReward t ⊗ₘ
-        sequentialStepKernel policy reward hPolicy hReward t
+      letI : IsMarkovKernel (step t) := hStep t
+      sequentialTranscript step hStep t ⊗ₘ step t
 
 theorem sequentialTranscript_isProbability
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (reward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hReward : ∀ t, IsMarkovKernel (reward t)) :
-    ∀ t, IsProbabilityMeasure (sequentialTranscript policy reward hPolicy hReward t) := by
+    (step : (t : Nat) → SequentialStep (A := A) (X := X) t)
+    (hStep : ∀ t, IsMarkovKernel (step t)) :
+    ∀ t, IsProbabilityMeasure (sequentialTranscript step hStep t) := by
   intro t
   induction t with
   | zero =>
       simpa [sequentialTranscript] using
         (inferInstance : IsProbabilityMeasure (Measure.dirac PUnit.unit))
   | succ t ih =>
-      letI : IsProbabilityMeasure
-          (sequentialTranscript policy reward hPolicy hReward t) := ih
-      letI : IsMarkovKernel (sequentialStepKernel policy reward hPolicy hReward t) :=
-        sequentialStepKernel_isMarkov policy reward hPolicy hReward t
+      haveI : IsProbabilityMeasure (sequentialTranscript step hStep t) := ih
+      haveI : IsMarkovKernel (step t) := hStep t
       simpa [sequentialTranscript] using
         (inferInstance : IsProbabilityMeasure
-          (sequentialTranscript policy reward hPolicy hReward t ⊗ₘ
-            sequentialStepKernel policy reward hPolicy hReward t))
+          (sequentialTranscript step hStep t ⊗ₘ step t))
 
-/-- Conditional KL cost of round t, evaluated under the baseline history law.
-The two environments share the same history-dependent action kernel. -/
+/-- Conditional KL cost at round t, evaluated under the baseline history law. -/
 noncomputable def sequentialLocalKL
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (baseReward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (altReward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hBase : ∀ t, IsMarkovKernel (baseReward t))
-    (hAlt : ∀ t, IsMarkovKernel (altReward t))
+    (baseStep altStep :
+      (t : Nat) → SequentialStep (A := A) (X := X) t)
+    (hBase : ∀ t, IsMarkovKernel (baseStep t))
+    (hAlt : ∀ t, IsMarkovKernel (altStep t))
     (t : Nat) : ℝ≥0∞ := by
-  letI : IsProbabilityMeasure
-      (sequentialTranscript policy baseReward hPolicy hBase t) :=
-    sequentialTranscript_isProbability policy baseReward hPolicy hBase t
-  letI : IsMarkovKernel (sequentialStepKernel policy baseReward hPolicy hBase t) :=
-    sequentialStepKernel_isMarkov policy baseReward hPolicy hBase t
-  letI : IsMarkovKernel (sequentialStepKernel policy altReward hPolicy hAlt t) :=
-    sequentialStepKernel_isMarkov policy altReward hPolicy hAlt t
+  letI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
+    sequentialTranscript_isProbability baseStep hBase t
+  letI : IsMarkovKernel (baseStep t) := hBase t
+  letI : IsMarkovKernel (altStep t) := hAlt t
   exact InformationTheory.klDiv
-    (sequentialTranscript policy baseReward hPolicy hBase t ⊗ₘ
-      sequentialStepKernel policy baseReward hPolicy hBase t)
-    (sequentialTranscript policy baseReward hPolicy hBase t ⊗ₘ
-      sequentialStepKernel policy altReward hPolicy hAlt t)
+    (sequentialTranscript baseStep hBase t ⊗ₘ baseStep t)
+    (sequentialTranscript baseStep hBase t ⊗ₘ altStep t)
 
 /--
-**Finite-horizon adaptive KL chain rule.**  The KL divergence between the laws
-of the complete transcripts is the sum of the per-round conditional KL costs.
-The action policy may be an arbitrary Markov kernel of the complete prior
-history, and it is shared by the two environments.
+**Finite-horizon adaptive KL chain rule.**  For two sequential experiments,
+the KL divergence between their complete transcript laws is the sum of the
+one-round conditional KL costs, with each cost evaluated under the baseline
+history law.  The transition kernels can depend on the entire previous
+history, so this theorem includes arbitrary adaptive randomized policies.
 -/
 theorem sequentialTranscript_kl_chain_rule
-    (policy : (t : Nat) → Kernel (SequentialHistory A X t) A)
-    (baseReward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (altReward : (t : Nat) → Kernel (SequentialHistory A X t × A) X)
-    (hPolicy : ∀ t, IsMarkovKernel (policy t))
-    (hBase : ∀ t, IsMarkovKernel (baseReward t))
-    (hAlt : ∀ t, IsMarkovKernel (altReward t)) :
+    (baseStep altStep :
+      (t : Nat) → SequentialStep (A := A) (X := X) t)
+    (hBase : ∀ t, IsMarkovKernel (baseStep t))
+    (hAlt : ∀ t, IsMarkovKernel (altStep t)) :
     ∀ t,
       InformationTheory.klDiv
-        (sequentialTranscript policy baseReward hPolicy hBase t)
-        (sequentialTranscript policy altReward hPolicy hAlt t) =
-      ∑ i ∈ Finset.range t,
-        sequentialLocalKL policy baseReward altReward hPolicy hBase hAlt i := by
+        (sequentialTranscript baseStep hBase t)
+        (sequentialTranscript altStep hAlt t) =
+      ∑ i ∈ Finset.range t, sequentialLocalKL baseStep altStep hBase hAlt i := by
   intro t
   induction t with
   | zero =>
-      rw [sequentialTranscript]
-      simp [InformationTheory.klDiv_self]
+      simp [sequentialTranscript, sequentialLocalKL, InformationTheory.klDiv_self]
   | succ t ih =>
-      letI : IsProbabilityMeasure
-          (sequentialTranscript policy baseReward hPolicy hBase t) :=
-        sequentialTranscript_isProbability policy baseReward hPolicy hBase t
-      letI : IsProbabilityMeasure
-          (sequentialTranscript policy altReward hPolicy hAlt t) :=
-        sequentialTranscript_isProbability policy altReward hPolicy hAlt t
-      letI : IsMarkovKernel (sequentialStepKernel policy baseReward hPolicy hBase t) :=
-        sequentialStepKernel_isMarkov policy baseReward hPolicy hBase t
-      letI : IsMarkovKernel (sequentialStepKernel policy altReward hPolicy hAlt t) :=
-        sequentialStepKernel_isMarkov policy altReward hPolicy hAlt t
+      haveI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
+        sequentialTranscript_isProbability baseStep hBase t
+      haveI : IsProbabilityMeasure (sequentialTranscript altStep hAlt t) :=
+        sequentialTranscript_isProbability altStep hAlt t
+      haveI : IsMarkovKernel (baseStep t) := hBase t
+      haveI : IsMarkovKernel (altStep t) := hAlt t
       rw [sequentialTranscript, sequentialTranscript,
         InformationTheory.klDiv_compProd_eq_add, ih]
       simp [sequentialLocalKL, Finset.sum_range_succ]
