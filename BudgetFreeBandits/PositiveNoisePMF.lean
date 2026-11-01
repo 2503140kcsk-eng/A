@@ -19,6 +19,7 @@ noncomputable section
 namespace BudgetFreeBandits
 
 open MeasureTheory ProbabilityTheory
+open scoped ENNReal
 
 /-- Baseline law: equal mass on the two non-marker outcomes. -/
 def spikeBasePMF : PMF (Fin 3) :=
