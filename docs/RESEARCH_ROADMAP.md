@@ -2,7 +2,7 @@
 
 ## Goal
 
-Characterize the best attainable stationary/dynamic regret profile for one nonanticipating policy in the oblivious stochastic bandit model when cumulative variance envelope Q and mean-variation budget B are unknown.
+Characterize the Pareto-minimal stationary/dynamic regret profiles attainable by one nonanticipating policy in the oblivious stochastic bandit model when cumulative variance envelope Q and mean-variation budget B are unknown.
 
 A complete result may be positive or negative. Do not force an algorithmic success claim if a lower bound rules it out.
 
@@ -12,7 +12,7 @@ A complete result may be positive or negative. Do not force an algorithmic succe
 - [x] Give the project a formal title in README.
 - [x] Pin Lean/Mathlib toolchain.
 - [x] Add CI build workflow.
-- [ ] Obtain and inspect first GitHub Actions result.
+- [ ] Obtain and inspect a successful GitHub Actions result.
 - [x] Record target paper open-question scope and prior-work guardrails.
 
 Acceptance: every theorem claim has a source or checked proof; CI result is linked rather than assumed.
@@ -21,7 +21,7 @@ Acceptance: every theorem claim has a source or checked proof; CI result is link
 
 - [x] Transcribe the two inequalities in Theorem 5.1 into explicit Lean assumptions.
 - [x] Prove r1 >= gu/12 from u^2=nq, u>=4, n<=u.
-- [ ] Build and run CI; fix every compiler error.
+- [ ] Obtain a green pinned-toolchain CI run with no warnings.
 - [ ] Add conversion to the paper's Omega(g*sqrt(nT)) form, recording exact T>=2 condition and constant.
 - [ ] Audit Lean assumptions against Theorem 5.1 line by line.
 
@@ -47,7 +47,8 @@ Acceptance: machine-checkable finite model plus independently reviewed mathemati
 ## Milestone 4 — unrestricted noisy lower-bound search
 
 - Extend hidden-improvement mixture so reward variance is positive and variance envelope is controlled.
-- Identify which observations carry information about (a) an improvement and (b) noise level.
+- Audit and, if valid, formalize the candidate Bernoulli/KL lower bound in [NOISY_LOWER_BOUND_CANDIDATE.md](NOISY_LOWER_BOUND_CANDIDATE.md).
+- Identify which observations carry information about (a) an improvement and (b) the noise level.
 - Derive change-of-measure constraints with exact dependence on A,T,Q,B.
 - Search for two or more environment families whose simultaneous requirements force a nontrivial adaptation penalty.
 - Separate an information-theoretic lower bound from an artifact of a chosen algorithm.
@@ -87,4 +88,4 @@ Revise the target if a prior paper proves the exact profile under the same feedb
 
 ## Current status
 
-The repository contains the literature-scoped target and a first Lean algebraic corollary. The unrestricted noisy adaptation problem remains **OPEN / NOT SOLVED**.
+The repository contains the literature-scoped target, a formalized algebraic consequence of a published lower bound, and a candidate positive-noise lower-bound direction. The unrestricted noisy adaptation problem remains **OPEN / NOT SOLVED**.
