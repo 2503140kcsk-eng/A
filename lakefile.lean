@@ -1,7 +1,7 @@
 import Lake
 open Lake DSL
 
-package «budget-free-bandits» where
+package budgetFreeBandits where
   version := v!"0.1.0"
 
 require mathlib from git
