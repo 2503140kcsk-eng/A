@@ -178,12 +178,12 @@ There are no false alarms under the baseline because every baseline support poin
 \[
 \mathbb E_0[R_T]=gpT.
 \]
-Under any alternative, while the change is undetected, the probability of observing the atom 1 in a given round is exactly \(p\varepsilon/n\). The detection time after \(\tau\) is geometric with mean \(n/(p\varepsilon)\). Before detection, every round's regret is at most \(2g\); after detection it is zero. Therefore
+Under any alternative, probing before the change also incurs regret. Its expected contribution is at most \(gp(\tau-1)\le gpT\). After the change, while it remains undetected, the probability of observing atom 1 in each round is exactly \(p\varepsilon/n\). The detection time after \(\tau\) is geometric with mean \(n/(p\varepsilon)\). Before detection, every post-change round's regret is at most \(2g\); after detection it is zero. Therefore
 \[
 \boxed{
 \mathbb E_{a,\tau}[R_T]
-\le2g\min\left\{T,\frac{n}{p\varepsilon}\right\}
-\le\frac{2gn}{p\varepsilon}.
+\le gpT+2g\min\left\{T,\frac{n}{p\varepsilon}\right\}
+\le gpT+\frac{2gn}{p\varepsilon}.
 }
 \tag{PN-UB}
 \]
