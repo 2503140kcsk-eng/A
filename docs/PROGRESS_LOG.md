@@ -46,3 +46,43 @@
 3. Extend the model definitions in Lean/Mathlib: action kernels, observed-history filtration, (Q), (B), and dynamic pseudo-regret.
 4. Develop a prior-free upper-bound candidate and compare it against the attainable-profile lower bounds.
 5. Keep PR #2 in draft until the complete proof assumptions and CI evidence are reviewed.
+
+
+## 2026-11-01 — positive-noise two-budget adaptation milestone
+
+### New environment family
+
+Added docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md and BudgetFreeBandits/PositiveNoiseAdaptation.lean.
+
+For \(A\ge2\), \(T\ge32A\), let \(n=A-1\), \(K=\lfloor T/2\rfloor\), \(q=K-1\), \(g=1/8\), \(\varepsilon=2/5\), and \(s_T^2=1/(4096T)\). The baseline uses positive-variance two-point laws with means \(1/2\) on arm 1 and \(3/8\) on all challengers. A challenger changed at \(\tau\in[2,K]\) becomes a mixture that places probability \(2/5\) on a uniquely detectable reward 1.
+
+Exact environment values:
+- Every arm and round has strictly positive variance.
+- Baseline budgets: \(Q_0=1/4096>0\), \(B_0=0\).
+- Alternative budgets: \(3T/64\le Q_{a,\tau}\le T/8\), \(B_{a,\tau}=1/4\).
+- One-observation KL in the baseline-to-alternative direction: \(\log(5/3)\).
+- A common adaptive action kernel contributes zero conditional KL; Mathlib's pinned KL composition-product identities give the one-round chain decomposition.
+
+### Family-specific adaptation theorem
+
+A coupling until the first marked pull, followed by a pathwise count of gaps between challenger pulls, yields
+\[
+r_0\le gnq/2\ \Longrightarrow\
+r_1\ge\frac{g^2nq}{8(r_0+gn)}.
+\]
+For the same disclosed finite family, a single policy that is not told \(Q,B\) samples challengers with probability \(p=(A/T)^{5/6}\) until observing the unique reward-1 signal, then commits. Its alternative regret bound explicitly includes both pre-change probing regret \(gpT\) and post-change detection delay \(2gn/(p\varepsilon)\). Against the supplied-budget benchmark \(\Xi(A,T;Q,B)\), the family-specific competitive ratio is bounded above by \(4(T/A)^{1/6}\); the lower-bound reduction gives a constant multiple of \((T/A)^{1/6}\). Thus the restricted-family order is \(\Theta((T/A)^{1/6})\).
+
+**Scope:** this is not the unrestricted Pareto frontier over all bounded stochastic environments. The upper algorithm exploits the disclosed spike-family structure. The finite-horizon KL induction, gap-counting argument, and expected-regret analysis are documented mathematical proofs, not yet end-to-end Lean proofs.
+
+### Lean verification status
+
+The new Lean module covers exact means, variances, variance-budget scalar bounds, one-step KL algebra, the common action-kernel KL cancellation adapter, the one-round KL chain adapter, and a final scalar competitive-ratio lemma. The first CI attempt failed on noncomputable real definitions and proof-script issues; those were corrected and the lower-ratio proof was split into a smaller product-bound lemma. Latest CI run for code commit 33c09331ee235b1b460bf740a9d8f0cbab27eab4 is being checked. Do not mark this module PASS until the pinned Lean v4.36.0-rc2 --wfail run succeeds.
+
+### Wolfram checks
+
+Added exact moment/KL calculations, alternative-budget counterexample searches under \(T\ge64\) and \(2\le\tau\le T/2\), and derivatives proving convexity/monotonicity of the gap function to docs/EXPERIMENT_LOG.md. These are symbolic sanity checks, not proofs of the probabilistic coupling or novelty.
+
+### Prior-work check
+
+Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019), Chen–Lee–Luo–Wei (COLT 2019), and Wei–Luo (COLT 2021) give prior-free results in related stochastic, contextual, and RL settings. The new target remains the two-positive-noise-budget selected-arm family relative to the Zhang (2026) supplied-\((Q,B)\) oracle benchmark, with full-model novelty still provisional.
+
