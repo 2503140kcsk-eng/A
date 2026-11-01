@@ -2,94 +2,112 @@
 
 **Project status: OPEN RESEARCH PROGRAM — NOT SOLVED.**
 
-This repository studies the limits of a single bandit policy that must adapt to both unknown reward-noise and unknown environmental drift. The target is a mathematically precise open problem identified in the 19 October 2026 preprint:
+This repository studies whether one nonanticipating bandit policy can adapt simultaneously to unknown reward-variance and mean-variation budgets. The motivating open problem is identified in Xiaojin Zhang, *Variance-Aware Non-Stationary Bandits: All-Budget Regret Bounds and Adaptation Costs*, arXiv:2610.26116v1 (19 October 2026).
 
-> Xiaojin Zhang, *Variance-Aware Non-Stationary Bandits: All-Budget Regret Bounds and Adaptation Costs*, arXiv:2610.26116v1.
-
-The paper characterizes the minimax rate when both budgets are supplied to the learner, and proves a sharp adaptation frontier on a disclosed deterministic one-improvement family. It explicitly leaves open a sharp prior-free schedule for the unrestricted noisy model. We will not relabel an existing theorem as a new result.
+The paper characterizes supplied-budget minimax rates and proves an adaptation frontier on a disclosed deterministic one-improvement family. It explicitly leaves open a sharp prior-free schedule for the unrestricted noisy model. This repository does not claim to solve that open problem.
 
 ## Research question
 
-In an oblivious stochastic multi-armed bandit with selected-arm feedback, can we characterize the best simultaneous guarantees of a *single policy* that knows the number of arms and horizon but is not given either:
+In an oblivious stochastic multi-armed bandit with selected-arm feedback, what is the Pareto-minimal stationary/dynamic regret profile attainable by one fixed policy that knows the number of arms and horizon but is not given either the cumulative variance envelope \(Q\) or the cumulative variation of the mean reward vector \(B\)?
 
-- the cumulative variance envelope (Q), or
-- the cumulative variation of the mean reward vector (B)?
+The target is a single policy's simultaneous guarantees, not the pointwise optimum of a different policy for every budget pair. Definitions and prior-work boundaries are in [docs/RESEARCH_QUESTION.md](docs/RESEARCH_QUESTION.md) and [docs/RELATED_WORK.md](docs/RELATED_WORK.md).
 
-The target is the Pareto-minimal boundary of the stationary/dynamic regret profiles attainable by one fixed policy, not the pointwise optimum of a different policy for every budget pair. The project seeks matching upper and lower bounds for this adaptation profile, or a stronger impossibility theorem.
+## Kernel-verified Lean milestones
 
-Definitions, conventions, known results, and the exact scope are in [docs/RESEARCH_QUESTION.md](docs/RESEARCH_QUESTION.md). Prior-work exclusions are in [docs/RELATED_WORK.md](docs/RELATED_WORK.md).
+The formal project is pinned to Lean \`v4.36.0-rc2\` and Mathlib tag \`v4.36.0-rc2\`. CI uses \`--wfail\`.
 
-## First verified milestone
+### Published-frontier algebra
 
-`BudgetFreeBandits/AdaptationFrontier.lean` formalizes an algebraic corollary of Theorem 5.1 of arXiv:2610.26116v1. Under the theorem's two regret inequalities and the paper's scale assumptions, it proves
-[
+\`BudgetFreeBandits/AdaptationFrontier.lean\` formalizes an algebraic corollary of Theorem 5.1 of arXiv:2610.26116v1. Under the theorem's two regret inequalities and the paper's scale assumptions, it proves
+\[
 r_1\geq \frac{gu}{12},
-\qquad
-u^2=nq,\quad u\geq4,\quad n\leq u.
-]
+\qquad u^2=nq,\quad u\geq4,\quad n\leq u.
+\]
 
-**Lean CI: PASS** — pinned Lean/Mathlib build completed with `--wfail`.
+This does not formalize the stochastic bandit model or the information-theoretic proof of Theorem 5.1. It is an algebraic corollary of the published theorem's hypotheses.
 
-The pinned Lean/Mathlib build passed with `--wfail` in [GitHub Actions run 41281044362](https://github.com/2503140kcsk-eng/A/actions/runs/41281044362), on code/workflow commit `e9e90b8b5c7393352c00de7f27ac91d95ada7f7d`. The subsequent branch commits changed research documents only; the Lean source, Lake files, toolchain, and workflow used by that run are unchanged.
+### Positive-noise scalar and finite-PMF layer
 
-**Important limitation:** this Lean theorem formalizes only the algebraic deduction from the paper's Theorem 5.1. It does *not* formalize the stochastic bandit model, the information-theoretic proof of Theorem 5.1, or a new solution to the unrestricted noisy adaptation problem.
+- \`BudgetFreeBandits/PositiveNoiseAdaptation.lean\` formalizes the point-spike family's exact scalar mean, variance, variance-budget and discrete one-step KL expressions; Mathlib's common-action-kernel KL cancellation; a one-round two-stage chain-rule adapter; and a conditional competitive-ratio algebra lemma.
+- \`BudgetFreeBandits/PositiveNoisePMF.lean\` constructs actual finite PMFs on \`Fin 3\`; defines expectation and variance using integrals against \`PMF.toMeasure\`; proves finite weighted-sum identities; and formalizes the discrete finite KL sum.
 
-**Positive-noise module CI: PASS** — the expanded Lean module built with Lean v4.36.0-rc2 and --wfail in [GitHub Actions run 41284538301](https://github.com/2503140kcsk-eng/A/actions/runs/41284538301), on commit 74cc24b7dba9aa94acd0556a9f9ca80ed9aeeb75. This verifies only the declarations present in the Lean module; the full finite-history KL induction and the path-counting/algorithm analyses remain outside the kernel-checked development.
+The PMF layer does **not** yet identify its discrete KL sum with Mathlib's measure-theoretic \`InformationTheory.klDiv\`. That attempted bridge is preserved as an archived draft, not counted as verified.
 
-## Positive-noise adaptation milestone (restricted family)
+Earlier pinned CI runs for the PMF module are [41288057061](https://github.com/2503140kcsk-eng/A/actions/runs/41288057061) and [41288061567](https://github.com/2503140kcsk-eng/A/actions/runs/41288061567).
 
-`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md` develops a two-class construction in which **every arm and every round has strictly positive reward variance**. The stationary class has \(Q_0=1/4096>0,\ B=0\); the one-change class has \(3T/64\le Q\le T/8\) and \(B=1/4\). The exact one-observation KL term is \(\log(5/3)\).
+## Restricted positive-noise mathematical result
 
-For this disclosed finite family, a gap-counting lower bound and a budget-unaware probe-and-commit policy give the same restricted-family oracle-competitive order:
+[docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md](docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md) gives a two-class, explicitly disclosed finite family in which every arm and round has strictly positive reward variance. The stationary class has \(Q_0=1/4096>0\) and \(B=0\); the changing class has \(3T/64\leq Q\leq T/8\) and \(B=1/4\). Its baseline-to-alternative one-observation KL is \(\log(5/3)\).
+
+For that restricted family, the written gap-counting/Jensen lower argument and a family-specific budget-unaware probe-and-commit policy yield a restricted-family oracle-competitive order
 \[
 \inf_{\pi\text{ not told }Q,B}\sup_{\nu\in\mathcal F}
 \frac{\mathbb E_\nu[R_T]}{\Xi(A,T;Q(\nu),B(\nu))}
-=\Theta\bigl((T/A)^{1/6}\bigr).
+=\Theta\!\left((T/A)^{1/6}\right).
 \]
-This is a genuine positive-noise adaptation obstruction, **but it is not the unrestricted two-dimensional Pareto frontier**. The policy upper bound uses the disclosed spike-family structure. The finite-history KL induction, gap-counting lemma, and algorithm regret calculation remain written proofs and are not yet kernel-checked end-to-end.
 
-`BudgetFreeBandits/PositiveNoiseAdaptation.lean` formalizes the scalar moments/budgets/KL term, common-action-kernel KL cancellation, one-round chain-rule adapter, and conditional competitive-ratio algebra. `BudgetFreeBandits/PositiveNoisePMF.lean` adds actual finite PMFs and integral-defined means/variances, plus the discrete finite KL sum. `BudgetFreeBandits/PositiveNoiseMeasureKL.lean` is an active proof attempt to identify that discrete value with Mathlib's measure-theoretic `InformationTheory.klDiv`; it is not kernel-verified yet. The complete finite-history induction and path-counting theorem also remain unverified.
+**Evidence boundary:** this lower/upper comparison is a mathematical write-up, not a complete Lean formalization. The full finite-history KL induction, the path-counting probability argument, the expected-regret calculation for the policy, and the final comparison with the oracle benchmark remain outside the kernel-checked development. The policy's upper bound uses the disclosed support-marker structure; it is not a general bounded-reward algorithm.
 
-The earlier Bernoulli construction remains in [docs/NOISY_LOWER_BOUND_CANDIDATE.md](docs/NOISY_LOWER_BOUND_CANDIDATE.md) as a separate information-theoretic candidate; it is not the current main adaptation construction. Exact symbolic checks and limitations are recorded in [docs/EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md).
+A second, genuinely non-degenerate signal distribution on \(\{3/4,7/8\}\) is derived in [docs/SEPARATED_SIGNAL_EXTENSION.md](docs/SEPARATED_SIGNAL_EXTENSION.md). It replaces the deterministic marker by a signal set disjoint from baseline support, but it still relies on perfect support separation and is not Lean-formalized.
+
+## Unverified proof drafts
+
+The following drafts are preserved under [docs/drafts](docs/drafts) and are deliberately **not** compiled or imported:
+
+- \`docs/drafts/PositiveNoiseMeasureKL.lean.md\`: attempt to connect the finite PMF KL sum to Mathlib's measure-level KL via \`withDensity\` and Radon–Nikodym derivatives.
+- \`docs/drafts/SequentialKL.lean.md\`: attempt to induct over full action/reward histories for arbitrary history-dependent randomized policies.
+
+Neither file is a verified theorem. Their latest CI failures and the next proof obligations are documented in the archived files. No \`sorry\`, \`admit\`, or axiom was added to force a green build.
+
+## Independent checks
+
+\`scripts/independent_checks.py\` uses Python's standard library and exact rational arithmetic to:
+- enumerate finite horizon-1-to-5 history-dependent randomized policies with a shared action kernel in both environments, checking the transcript likelihood-ratio identity;
+- enumerate pull-time subsets and check the gap-counting/Cauchy–Schwarz inequalities for \(q\leq10\);
+- sweep exact rational variance-budget envelopes for both signal constructions.
+
+The script runs before Lean in [\`.github/workflows/lean.yml\`](.github/workflows/lean.yml). It is a finite regression test, not a proof over all horizons or policies.
 
 ## Repository map
 
-- `BudgetFreeBandits/AdaptationFrontier.lean` — Lean proof of the published-frontier algebraic corollary.\n- `BudgetFreeBandits/PositiveNoiseAdaptation.lean` — scalar moment/KL identities, Mathlib KL-kernel adapters, and conditional competitive-ratio algebra.\n- `BudgetFreeBandits/PositiveNoisePMF.lean` — finite PMFs, true-measure expectations/variances, and discrete KL sum.\n- `BudgetFreeBandits/PositiveNoiseMeasureKL.lean` — current measure-level KL bridge draft; not yet CI-verified.\n- `BudgetFreeBandits/SequentialKL.lean` — finite-history KL induction draft; deliberately excluded from root imports until it type-checks.\n- `scripts/independent_checks.py` — exact-rational finite regression tests, automatically run before Lean CI.\n- `docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md` — positive-noise two-budget family, path-counting lower bound, family-specific budget-unaware algorithm, and scope limitations.
-- `docs/RESEARCH_QUESTION.md` — model definitions, Pareto-profile target, scope, and non-goals.
-- `docs/RELATED_WORK.md` — literature audit and novelty guardrails.
-- `docs/RESEARCH_ROADMAP.md` — phased work plan and acceptance criteria.
-- `docs/NOISY_LOWER_BOUND_CANDIDATE.md` — unproved positive-noise lower-bound candidate.
-- `docs/EXPERIMENT_LOG.md` — exact symbolic checks and evidence boundary.
-- `docs/PROGRESS_LOG.md` — completed work, verification links, and next tasks.
-- `docs/TOOL_ROLES.md` — roles and limits of the connected open-source tools.
-- `.github/workflows/lean.yml` — Lean build on pushes and pull requests.
+- \`BudgetFreeBandits/AdaptationFrontier.lean\` — published-frontier algebraic corollary.
+- \`BudgetFreeBandits/PositiveNoiseAdaptation.lean\` — scalar identities, Mathlib KL adapters, and conditional ratio algebra.
+- \`BudgetFreeBandits/PositiveNoisePMF.lean\` — finite PMFs, integral-based moments, and discrete KL sum.
+- \`scripts/independent_checks.py\` — exact-rational finite regression tests.
+- \`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md\` — restricted positive-noise family and written upper/lower arguments.
+- \`docs/SEPARATED_SIGNAL_EXTENSION.md\` — non-degenerate, support-separated signal extension.
+- \`docs/drafts/\` — archived, explicitly unverified Lean drafts.
+- \`docs/RELATED_WORK.md\` — literature audit and novelty guardrails.
+- \`docs/RESEARCH_ROADMAP.md\` — remaining proof and research milestones.
+- \`docs/TOOL_ROLES.md\` — roles and actual execution boundaries of mathematical tools.
+- \`docs/PROGRESS_LOG.md\` — verification history and remaining tasks.
 
 ## Verification
 
-The formal project is pinned to Lean `v4.36.0-rc2` and Mathlib tag `v4.36.0-rc2`. From a clean checkout, run:
+From a clean checkout:
 
-```sh
+\`\`\`sh
 lake exe cache get
 lake build
-```
+\`\`\`
 
-The CI build is the authoritative execution check. A written proof, a symbolic calculation, a solver result, or an AI explanation is not counted as Lean-verified until the CI job succeeds.
+GitHub Actions on the current PR head is the authoritative check. A written proof, symbolic calculation, solver output, or AI explanation is not counted as Lean-verified until the pinned kernel build succeeds.
 
 ## Evidence policy
 
-- **PROVED:** kernel-checked Lean theorem, with exact file and CI run linked.
-- **REPRODUCED:** independently reproduced computation or published result, with scripts and assumptions.
+- **PROVED:** kernel-checked Lean theorem, with exact source and CI run linked.
+- **REPRODUCED:** independently reproduced finite computation or published result, with assumptions and script.
 - **CONJECTURE:** candidate statement not yet proved.
-- **OPEN:** precise target with no accepted proof in this repository.
+- **OPEN:** precise target without an accepted proof in this repository.
 - **BLOCKED:** missing prerequisites or failed verification.
 
-No `sorry`, `admit`, fabricated experiment, unverified CI pass, or paid service is permitted. An incomplete theorem remains incomplete.
-
-## Project title and repository name
-
-The project title is set in this README. The connected GitHub actions available in this session can create branches, files, commits, issues, and pull requests, but do not expose the repository-rename endpoint. Therefore the GitHub repository slug remains `2503140kcsk-eng/A` until it is renamed through GitHub's repository settings.
+The unrestricted unknown-\((Q,B)\) adaptation problem remains **OPEN**. Publication-level novelty for the restricted positive-noise family remains **UNVERIFIED**.
 
 ## Primary source
 
 - https://arxiv.org/abs/2610.26116
 - https://arxiv.org/html/2610.26116v1
+
+## Repository slug
+
+The project title is set above. Repository slug is still \`2503140kcsk-eng/A\); this session's GitHub connector does not expose repository renaming, so the slug must be changed through GitHub repository settings.
