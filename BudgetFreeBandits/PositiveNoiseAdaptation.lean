@@ -115,13 +115,12 @@ theorem spike_alternative_budget_bounds
       spikeAlternativeVariance (spikeNoiseVariance T) ≤ 1 / 8 :=
     spike_alternative_variance_upper hT
   have hbase_le : spikeNoiseVariance T ≤ 1 / 8 := by
-    have hbase_eq : spikeNoiseVariance T ≤
-        spikeAlternativeVariance (spikeNoiseVariance T) := by
-      rw [spike_alternative_variance_exact]
-      have hnonneg : 0 ≤ spikeNoiseVariance T := by
-        exact (spike_noise_variance_positive hTpos).le
-      nlinarith [hnonneg]
-    exact le_trans hbase_eq halt_hi
+    have hsmall : spikeNoiseVariance T ≤ 1 / 131072 := by
+      unfold spikeNoiseVariance
+      rw [div_le_iff₀ (by positivity : 0 < 4096 * T)]
+      norm_num
+      nlinarith
+    exact le_trans hsmall (by norm_num : (1 / 131072 : ℝ) ≤ 1 / 8)
   have halt_lo :
       3 / 32 ≤ spikeAlternativeVariance (spikeNoiseVariance T) :=
     spike_alternative_variance_lower hTpos
