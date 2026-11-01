@@ -95,3 +95,17 @@ At least one outcome is required:
 - **Structural theorem:** a proved decomposition of the attainable stationary/dynamic regret region reducing the problem to explicit inequalities, together with a proof that the reduction is exact.
 
 A numerical experiment, solver output, proof sketch, or verified algebraic corollary alone does not solve the main problem.
+
+
+## 8. Positive-noise two-class subproblem now isolated
+
+The project now contains a separate restricted-family theorem in docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md. It is not a replacement for the full Pareto-profile target above.
+
+The finite family uses two-point baseline laws with variance \(1/(4096T)>0\) on every arm and a rare identifiable reward-1 atom on one challenger after a hidden change. Consequently:
+- the stationary class has \(Q_0=1/4096>0,B=0\);
+- each alternative has \(3T/64\le Q\le T/8\) and \(B=1/4\);
+- the baseline-to-alternative one-observation KL is \(\log(5/3)\);
+- a gap-counting coupling yields a stationary-to-change lower frontier;
+- a family-specific probe-and-commit policy, not given the realized budgets, matches the restricted oracle-competitive order \(\Theta((T/A)^{1/6})\).
+
+This establishes a positive-noise adaptation cost on one explicit finite family. It does not establish the attainable Pareto boundary over the full environment class \(\mathcal E(A,T;Q,B)\), and its upper algorithm exploits the disclosed spike-family structure. The general prior-free \((Q,B)\) adaptation question remains OPEN.
