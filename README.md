@@ -91,7 +91,7 @@ lake exe cache get
 lake build
 \`\`\`
 
-GitHub Actions on the current PR head is the authoritative check. A written proof, symbolic calculation, solver output, or AI explanation is not counted as Lean-verified until the pinned kernel build succeeds.
+**Current PR-head CI: PASS.** The exact independent checks and pinned Lean/Mathlib build with `--wfail` both passed on current head `a16ee752b4fd5b66a22af33a78941b1efab6faed` in [GitHub Actions run 41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148). The four commits after the source-cleanup commit `8d777022` modify documentation only; the compiled Lean source, toolchain, Lake files, test script, and workflow are unchanged. A written proof, symbolic calculation, solver output, or AI explanation is not counted as Lean-verified until the pinned kernel build succeeds.
 
 ## Evidence policy
 
