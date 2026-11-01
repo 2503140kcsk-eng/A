@@ -141,7 +141,7 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 ### Current status — do not overclaim
 - **CI:** the compiled Lean target and finite regression script pass.
 - **Kernel-verified:** published-frontier algebraic corollary; positive-noise scalar moments/budgets/KL expression and Mathlib one-round adapters; finite PMFs, their measure-based moments, and discrete finite KL sum.
-- **Not kernel-verified:** equality of the discrete PMF KL with Mathlib's measure-level `InformationTheory.klDiv`; arbitrary-history finite-horizon KL induction; the path-counting lower proof; the family-specific policy expected-regret theorem; and the final restricted-family oracle ratio proof.
+- **Not kernel-verified:** equality of the discrete PMF KL with Mathlib's measure-level `InformationTheory.klDiv`; the point-spike-specific local-KL specialization of the verified generic sequential chain rule; the path-counting lower proof; the family-specific policy expected-regret theorem; and the final restricted-family oracle ratio proof.
 - **Research status:** the point-spike restricted-family upper/lower result and the non-degenerate support-separated extension remain written mathematical arguments. The latter is not formalized in Lean. Neither is a solution to the unrestricted unknown-`(Q,B)` problem; publication-level novelty remains unverified.
 - PR #2 remains Draft and must not be merged as a complete formal solution.
 ### Latest current-head CI result
