@@ -19,11 +19,12 @@ The paper itself should be read before every claimed advance. A change in notati
 
 ### Prior-free deterministic variation tracking
 
-The target paper identifies a 2016 work under its bibliography key KA16. It states that the earlier work already studied adaptation to unknown variation and provides a prior-free deterministic guarantee of order
-O(log(T) * [sqrt(A*T) + A^(1/3)*T^(2/3)*Delta^(1/3)]),
-and that its supplementary Appendix D outlines, but defers, a general-arm noisy extension.
+Karnin and Anava, *Multi-armed Bandits: Competing with Optimal Sequences*, Advances in Neural Information Processing Systems 29 (NIPS 2016):
+https://papers.nips.cc/paper/6341-multi-armed-bandits-competing-with-optimal-sequences
 
-Implication: “unknown variation budget” and “zero-noise non-stationary bandits” are not novel problem formulations. The gap must specifically involve the simultaneous variance-sensitive and variation-sensitive profile in the unrestricted noisy selected-arm-feedback model. The reference paper's bibliography key is retained rather than guessing author metadata.
+The 2016 paper studies a bandit/adversarial sequential-comparator formulation and gives a variation-adaptive guarantee without requiring the variation budget as input in its own setting. The 2026 target paper specifically cites the supplementary Theorem A.1 for a prior-free deterministic guarantee and says the supplementary Appendix D outlines, but defers, a general-arm noisy extension.
+
+Implication: “unknown variation budget” alone is not a novelty claim. Nor may the 2016 adversarial comparator guarantee be silently transferred to the present stochastic, variance-sensitive dynamic-best-arm model. The feedback, comparator, environment, and variation conventions must be compared theorem by theorem.
 
 ### Variance-sensitive non-stationary regret
 
