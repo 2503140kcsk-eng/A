@@ -20,6 +20,8 @@ noncomputable section
 open MeasureTheory ProbabilityTheory
 open scoped ProbabilityTheory ENNReal
 
+set_option linter.style.haveILetI false
+
 namespace BudgetFreeBandits
 
 universe uA uX
@@ -81,12 +83,12 @@ noncomputable def sequentialLocalKL
     (baseStep altStep :
       (t : Nat) → SequentialStep (A := A) (X := X) t)
     (hBase : ∀ t, IsMarkovKernel (baseStep t))
-    (hAlt : ∀ t, IsMarkovKernel (altStep t))
+    (_hAlt : ∀ t, IsMarkovKernel (altStep t))
     (t : Nat) : ℝ≥0∞ := by
   letI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
     sequentialTranscript_isProbability baseStep hBase t
   letI : IsMarkovKernel (baseStep t) := hBase t
-  letI : IsMarkovKernel (altStep t) := hAlt t
+  letI : IsMarkovKernel (altStep t) := _hAlt t
   exact InformationTheory.klDiv
     (sequentialTranscript baseStep hBase t ⊗ₘ baseStep t)
     (sequentialTranscript baseStep hBase t ⊗ₘ altStep t)
