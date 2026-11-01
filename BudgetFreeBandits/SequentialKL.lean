@@ -14,16 +14,25 @@ stationarity or a non-adaptive action schedule.
 noncomputable section
 
 open MeasureTheory ProbabilityTheory
-open scoped ProbabilityTheory
+open scoped ProbabilityTheory ENNReal
 
 namespace BudgetFreeBandits
 
 /-- Full observed history before round t: all previous actions and rewards. -/
-def SequentialHistory (A X : Type*) : Nat → Type
+def SequentialHistory (A X : Type*) : Nat → Type*
   | 0 => PUnit
   | t + 1 => SequentialHistory A X t × (A × X)
 
 variable {A X : Type*} [MeasurableSpace A] [MeasurableSpace X]
+
+/-- The recursive finite-history space carries the product measurable space. -/
+instance sequentialHistoryMeasurableSpace (t : Nat) :
+    MeasurableSpace (SequentialHistory A X t) := by
+  induction t with
+  | zero => infer_instance
+  | succ t ih =>
+      letI : MeasurableSpace (SequentialHistory A X t) := ih
+      infer_instance
 
 /-- One-round joint action/reward kernel, allowing the action law to depend
 on the complete current history. -/
