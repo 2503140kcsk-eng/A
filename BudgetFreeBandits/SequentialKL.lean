@@ -19,7 +19,9 @@ open scoped ProbabilityTheory ENNReal
 namespace BudgetFreeBandits
 
 /-- Full observed history before round t: all previous actions and rewards. -/
-def SequentialHistory (A X : Type*) : Nat → Type*
+universe uA uX
+
+def SequentialHistory (A : Type uA) (X : Type uX) : Nat → Type (max uA uX)
   | 0 => PUnit
   | t + 1 => SequentialHistory A X t × (A × X)
 
@@ -29,7 +31,7 @@ variable {A X : Type*} [MeasurableSpace A] [MeasurableSpace X]
 instance sequentialHistoryMeasurableSpace (t : Nat) :
     MeasurableSpace (SequentialHistory A X t) := by
   induction t with
-  | zero => infer_instance
+  | zero => exact ⊤
   | succ t ih =>
       letI : MeasurableSpace (SequentialHistory A X t) := ih
       infer_instance
@@ -138,7 +140,8 @@ theorem sequentialTranscript_kl_chain_rule
   intro t
   induction t with
   | zero =>
-      simp [sequentialTranscript, sequentialLocalKL]
+      rw [sequentialTranscript]
+      simp [InformationTheory.klDiv_self]
   | succ t ih =>
       letI : IsProbabilityMeasure
           (sequentialTranscript policy baseReward hPolicy hBase t) :=
