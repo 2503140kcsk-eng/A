@@ -145,3 +145,8 @@ The attempted measure-level KL bridge and finite-history sequential KL induction
 They are no longer Lean source files and are not part of the compiled library. The root import graph now includes only the three core modules with kernel-checked declarations. This is an explicit quarantine, not a claim that the archived proofs were completed.
 
 The remaining end-to-end proof obligations are unchanged: finite-history adaptive KL induction, the path-counting lower bound, the policy expected-regret calculation, and the final oracle-competitive ratio theorem.
+## Check 9 — current-head reproducible CI
+
+Pinned GitHub Actions run [41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148) completed successfully on current PR head `a16ee752b4fd5b66a22af33a78941b1efab6faed`. Both the exact independent finite-check step and the Lean/Mathlib v4.36.0-rc2 build with `--wfail` succeeded.
+
+The four commits between source-cleanup commit `8d77702299c2c46fe3cd33b2e517efcc34d8b0d6` and this head are documentation-only. This CI pass verifies the compiled formal library and the finite regression script; it does not change the status of the archived measure-level KL or sequential-history proof drafts, nor does it kernel-check the written bandit lower/upper arguments.
