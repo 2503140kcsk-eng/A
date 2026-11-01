@@ -34,9 +34,11 @@ The pinned Lean/Mathlib build passed with `--wfail` in [GitHub Actions run 41281
 
 **Important limitation:** this Lean theorem formalizes only the algebraic deduction from the paper's Theorem 5.1. It does *not* formalize the stochastic bandit model, the information-theoretic proof of Theorem 5.1, or a new solution to the unrestricted noisy adaptation problem.
 
+**Positive-noise module CI: PASS** — the expanded Lean module built with Lean v4.36.0-rc2 and --wfail in [GitHub Actions run 41284538301](https://github.com/2503140kcsk-eng/A/actions/runs/41284538301), on commit 74cc24b7dba9aa94acd0556a9f9ca80ed9aeeb75. This verifies only the declarations present in the Lean module; the full finite-history KL induction and the path-counting/algorithm analyses remain outside the kernel-checked development.
+
 ## Positive-noise adaptation milestone (restricted family)
 
-\`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md\` develops a two-class construction in which **every arm and every round has strictly positive reward variance**. The stationary class has \(Q_0=1/4096>0,\ B=0\); the one-change class has \(3T/64\le Q\le T/8\) and \(B=1/4\). The exact one-observation KL term is \(\log(5/3)\).
+`docs/POSITIVE_NOISE_ADAPTATION_THEOREM.md` develops a two-class construction in which **every arm and every round has strictly positive reward variance**. The stationary class has \(Q_0=1/4096>0,\ B=0\); the one-change class has \(3T/64\le Q\le T/8\) and \(B=1/4\). The exact one-observation KL term is \(\log(5/3)\).
 
 For this disclosed finite family, a gap-counting lower bound and a budget-unaware probe-and-commit policy give the same restricted-family oracle-competitive order:
 \[
@@ -46,7 +48,7 @@ For this disclosed finite family, a gap-counting lower bound and a budget-unawar
 \]
 This is a genuine positive-noise adaptation obstruction, **but it is not the unrestricted two-dimensional Pareto frontier**. The policy upper bound uses the disclosed spike-family structure. The finite-history KL induction, gap-counting lemma, and algorithm regret calculation remain written proofs and are not yet kernel-checked end-to-end.
 
-\`BudgetFreeBandits/PositiveNoiseAdaptation.lean\` formalizes the exact moments/budgets/KL scalar, Mathlib's adaptive action-kernel cancellation and one-round KL decomposition, and an algebraic competitive-ratio reduction from the lower-frontier hypothesis. It does not yet formalize the complete finite-horizon induction or the path-counting lemma.
+`BudgetFreeBandits/PositiveNoiseAdaptation.lean` formalizes the exact moments/budgets/KL scalar, Mathlib's adaptive action-kernel cancellation and one-round KL decomposition, and an algebraic competitive-ratio reduction from the lower-frontier hypothesis. It does not yet formalize the complete finite-horizon induction or the path-counting lemma.
 
 The earlier Bernoulli construction remains in [docs/NOISY_LOWER_BOUND_CANDIDATE.md](docs/NOISY_LOWER_BOUND_CANDIDATE.md) as a separate information-theoretic candidate; it is not the current main adaptation construction. Exact symbolic checks and limitations are recorded in [docs/EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md).
 
