@@ -37,12 +37,12 @@ abbrev spikeAlternativeMeasure : Measure (Fin 3) :=
 /-- The Radon--Nikodym density of the baseline law with respect to the
 alternative law: 5/3 on baseline support and 0 on the marker. -/
 def spikeDensity (i : Fin 3) : ℝ≥0∞ :=
-  if i = 2 then 0 else 5 / 3
+  if i = 2 then 0 else ENNReal.ofReal (5 / 3)
 
-@[simp] theorem spikeDensity_zero : spikeDensity 0 = (5 / 3 : ℝ≥0∞) := by
+@[simp] theorem spikeDensity_zero : spikeDensity 0 = ENNReal.ofReal (5 / 3) := by
   simp [spikeDensity]
 
-@[simp] theorem spikeDensity_one : spikeDensity 1 = (5 / 3 : ℝ≥0∞) := by
+@[simp] theorem spikeDensity_one : spikeDensity 1 = ENNReal.ofReal (5 / 3) := by
   simp [spikeDensity]
 
 @[simp] theorem spikeDensity_marker : spikeDensity 2 = 0 := by
@@ -57,10 +57,8 @@ theorem spikeBase_toMeasure_eq_withDensity :
   rw [withDensity_apply spikeDensity hs, lintegral_fintype]
   rw [PMF.toMeasure_apply spikeBasePMF hs]
   simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
-    spikeBasePMF, spikeAlternativePMF, Fin.sum_univ_succ,
-    Finset.sum_univ_succ, tsum_fintype]
-  simp only [PMF.toMeasure_apply_singleton spikeAlternativePMF]
-
+    spikeBasePMF, spikeAlternativePMF, Fin.sum_univ_succ, tsum_fintype,
+    PMF.toMeasure_apply_singleton spikeAlternativePMF]
   ring_nf
 
 /-- The baseline measure is absolutely continuous with respect to the alternative. -/
@@ -78,7 +76,7 @@ theorem spikeBase_rnDeriv_eq_density :
   have htop : ∀ᵐ i ∂spikeAlternativeMeasure, spikeDensity i ≠ ∞ :=
     ae_of_all _ (by
       intro i
-      fin_cases i <;> norm_num [spikeDensity])
+      fin_cases i <;> simp [spikeDensity])
   have h := Measure.rnDeriv_withDensity_left
     (μ := spikeAlternativeMeasure)
     (ν := spikeAlternativeMeasure)
@@ -117,9 +115,9 @@ theorem spike_measure_kl_exact :
           rw [lintegral_fintype]
     _ = ENNReal.ofReal (Real.log (5 / 3)) := by
           simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
-            spikeAlternativePMF, PMF.toMeasure_apply_singleton,
-            InformationTheory.klFun, Fin.sum_univ_succ]
-          ring
+            spikeAlternativePMF, InformationTheory.klFun, Fin.sum_univ_succ,
+            ENNReal.toReal_ofReal, PMF.toMeasure_apply_singleton spikeAlternativePMF]
+          ring_nf
 
 /-- The real-valued KL obtained from Mathlib's measure KL is log(5/3). -/
 theorem spike_measure_kl_toReal_exact :
