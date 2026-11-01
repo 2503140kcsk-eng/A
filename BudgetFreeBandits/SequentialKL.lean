@@ -30,14 +30,19 @@ def SequentialHistory (A : Type uA) (X : Type uX) :
 variable {A : Type uA} {X : Type uX}
   [MeasurableSpace A] [MeasurableSpace X]
 
-/-- Product measurable space on every finite-history type. -/
-instance sequentialHistoryMeasurableSpace (t : Nat) :
-    MeasurableSpace (SequentialHistory A X t) := by
-  induction t with
-  | zero => exact PUnit.instMeasurableSpace
-  | succ t ih =>
-      letI : MeasurableSpace (SequentialHistory A X t) := ih
-      infer_instance
+/-- The recursively chosen product measurable space on every finite-history type. -/
+def sequentialHistoryMeasurableSpace (t : Nat) :
+    MeasurableSpace (SequentialHistory A X t) :=
+  match t with
+  | 0 => PUnit.instMeasurableSpace
+  | t + 1 =>
+      MeasurableSpace.prod
+        (sequentialHistoryMeasurableSpace t)
+        (MeasurableSpace.prod ‹MeasurableSpace A› ‹MeasurableSpace X›)
+
+instance sequentialHistoryMeasurableSpaceInstance (t : Nat) :
+    MeasurableSpace (SequentialHistory A X t) :=
+  sequentialHistoryMeasurableSpace (A := A) (X := X) t
 
 /-- Joint transition law for the next action and reward, given the complete past. -/
 abbrev SequentialStep (t : Nat) :=
@@ -53,6 +58,7 @@ noncomputable def sequentialTranscript
       letI : IsMarkovKernel (step t) := hStep t
       sequentialTranscript step hStep t ⊗ₘ step t
 
+set_option linter.style.haveILetI false in
 theorem sequentialTranscript_isProbability
     (step : (t : Nat) → SequentialStep (A := A) (X := X) t)
     (hStep : ∀ t, IsMarkovKernel (step t)) :
@@ -74,12 +80,12 @@ noncomputable def sequentialLocalKL
     (baseStep altStep :
       (t : Nat) → SequentialStep (A := A) (X := X) t)
     (hBase : ∀ t, IsMarkovKernel (baseStep t))
-    (hAlt : ∀ t, IsMarkovKernel (altStep t))
+    (_hAlt : ∀ t, IsMarkovKernel (altStep t))
     (t : Nat) : ℝ≥0∞ := by
   letI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
     sequentialTranscript_isProbability baseStep hBase t
   letI : IsMarkovKernel (baseStep t) := hBase t
-  letI : IsMarkovKernel (altStep t) := hAlt t
+  letI : IsMarkovKernel (altStep t) := _hAlt t
   exact InformationTheory.klDiv
     (sequentialTranscript baseStep hBase t ⊗ₘ baseStep t)
     (sequentialTranscript baseStep hBase t ⊗ₘ altStep t)
@@ -91,6 +97,7 @@ one-round conditional KL costs, with each cost evaluated under the baseline
 history law.  The transition kernels can depend on the entire previous
 history, so this theorem includes arbitrary adaptive randomized policies.
 -/
+set_option linter.style.haveILetI false in
 theorem sequentialTranscript_kl_chain_rule
     (baseStep altStep :
       (t : Nat) → SequentialStep (A := A) (X := X) t)
