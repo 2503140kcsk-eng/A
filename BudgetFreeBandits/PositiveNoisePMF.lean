@@ -159,6 +159,36 @@ def pmfKL (p q : PMF (Fin 3)) : ℝ :=
   ∑ i, if p i = 0 then 0 else
     (p i).toReal * Real.log ((p i).toReal / (q i).toReal)
 
+/-- Log-likelihood ratio on a finite PMF space, with value zero off the first PMF's support. -/
+def pmfLogLikelihood (p q : PMF (Fin 3)) (i : Fin 3) : ℝ :=
+  if p i = 0 then 0 else
+    Real.log ((p i).toReal / (q i).toReal)
+
+/-- Discrete KL is exactly the expectation under P of its log-likelihood ratio. -/
+theorem pmfKL_eq_expected_log_likelihood (p q : PMF (Fin 3)) :
+    pmfKL p q = pmfExpectation p (pmfLogLikelihood p q) := by
+  rw [pmfExpectation_eq_sum]
+  unfold pmfKL pmfLogLikelihood
+  classical
+  refine Finset.sum_congr rfl ?_
+  intro i hi
+  by_cases hp : p i = 0
+  · simp [hp]
+  · simp [hp]
+
+/-- The alternative law assigns positive mass to every point in the baseline support. -/
+theorem spike_alternative_positive_on_base_support :
+    ∀ i : Fin 3, spikeBasePMF i ≠ 0 → spikeAlternativePMF i ≠ 0 := by
+  intro i hi
+  fin_cases i <;> simp_all
+
+/-- The concrete KL formula is the expected log-likelihood under the actual baseline PMF. -/
+theorem spike_pmf_kl_as_expected_log_likelihood :
+    pmfKL spikeBasePMF spikeAlternativePMF =
+      pmfExpectation spikeBasePMF
+        (pmfLogLikelihood spikeBasePMF spikeAlternativePMF) := by
+  exact pmfKL_eq_expected_log_likelihood _ _
+
 /-- Exact baseline-to-alternative KL, computed from the two genuine PMFs. -/
 theorem spike_pmf_kl_exact :
     pmfKL spikeBasePMF spikeAlternativePMF = Real.log (5 / 3) := by
