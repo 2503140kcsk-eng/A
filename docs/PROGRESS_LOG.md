@@ -109,10 +109,10 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 - The first CI attempts exposed missing imports, the need for an explicit discrete measurable space, and incorrect namespace/argument syntax. The current draft has been revised to use named baseline/alternative measures and explicit constructors.
 - **Not yet verified:** do not treat spike_measure_kl_exact as a Lean theorem until the current pinned workflow passes. If it remains unstable, quarantine the module from the root import rather than weaken it with sorry or axioms.
 
-### Finite-history KL induction — still a draft
-- BudgetFreeBandits/SequentialKL.lean is not imported by BudgetFreeBandits.lean.
-- It attempts to iterate Mathlib's klDiv_compProd_eq_add over recursively defined action/reward histories, but prior CI attempts exposed dependent-history measurable-space and recursion/elaboration issues.
-- **Not verified:** this is not a completed all-history adaptive KL proof. The next formalization should first establish a small finite-horizon theorem for a fixed history type and explicit joint transition kernels, then generalize by induction.
+### Finite-history KL induction — first attempt archived, replacement now verified
+- The first `SequentialKL.lean` attempt used an implicit product history measurable space and failed because the product type did not reduce to the recursive next-history type. That source was archived as `docs/drafts/SequentialKL.lean.md`.
+- A replacement `BudgetFreeBandits/SequentialKL.lean` defines recursive measurable spaces on complete histories, defines the transcript measure as successive composition-products, and proves the finite-horizon KL chain rule for arbitrary history-dependent Markov transition kernels.
+- The replacement is now imported by `BudgetFreeBandits.lean` and passed pinned Lean v4.36.0-rc2 CI with `--wfail` in runs 41300592276 and 41300588286.
 
 ### Research and PR state
 - The arXiv 2610.26116v1 record and related prior-work sources were rechecked. Gap-counting, coupling-until-detection, Jensen averaging, and probe/commit monitoring are not claimed as new techniques. The current candidate extension is only to positive-variance finite distributions with a perfectly separating signal event.
@@ -149,3 +149,24 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 - The current PR head at the time of this update is `a16ee752b4fd5b66a22af33a78941b1efab6faed`.
 - [GitHub Actions run 41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148) completed with conclusion **success**. Its exact independent finite checks and pinned Lean/Mathlib `--wfail` build both passed.
 - Compared with source-cleanup commit `8d77702299c2c46fe3cd33b2e517efcc34d8b0d6`, the four intervening commits modify only README and research documentation. No Lean, Lake, toolchain, script, or workflow source changed.
+## 2026-11-01 — finite-horizon adaptive KL chain rule completed
+
+### Verified theorem and model
+- Added the replacement source module `BudgetFreeBandits/SequentialKL.lean` and imported it from `BudgetFreeBandits.lean`.
+- Histories are recursively represented as PUnit at time zero and as the previous history paired with the next action/reward pair at later times. Their measurable spaces are defined recursively to match Mathlib's product-measure construction.
+- A `SequentialStep t` is a Markov kernel from the complete history at time t to the next `(action, reward)` pair. Because the kernel is history-indexed, it includes arbitrary nonanticipating randomized policies encoded in the joint action/reward transition.
+- `sequentialTranscript` constructs the finite transcript law recursively using `Measure.compProd`. A separate theorem proves that every such transcript law is a probability measure.
+- `sequentialLocalKL` evaluates the next-step joint-kernel KL under the baseline history law.
+- `sequentialTranscript_kl_chain_rule` proves the full finite-horizon KL equals the sum of those local conditional KL costs, using Mathlib's `InformationTheory.klDiv_compProd_eq_add`.
+- The module contains no `sorry`, `admit`, or new axiom. The earlier failed attempt remains archived as a historical diagnostic, not the active proof.
+
+### CI evidence
+- The source/root-import commit `7439b9ac2ab1dda7f1af488b644ad62ea1b1d468` exposed linter warnings under `--wfail`; no mathematical goal failed. The warnings were resolved by using the project linter option for proof-local instance bindings and marking the proof-only parameter appropriately.
+- Final source commit `8e7ae0dc10024ac0b7289dd397ea0a1a27324a37` passed both independent regression checks and the full pinned Lean/Mathlib build in [run 41300592276](https://github.com/2503140kcsk-eng/A/actions/runs/41300592276) and [run 41300588286](https://github.com/2503140kcsk-eng/A/actions/runs/41300588286).
+- The exact finite test outputs were: 200 randomized history-dependent policies; 53,516 baseline transcripts; 2,046 pull-time subsets for gap-counting/Cauchy–Schwarz; and 13,231 exact rational variance-budget pairs.
+
+### Remaining formalization boundary
+- The generic finite-horizon chain rule is verified. Its concrete specialization to the point-spike family, reducing each local cost to `log(5/3)` times the baseline probability of selecting the changed arm, is still an additional formalization task.
+- The finite PMF discrete-KL sum is verified, but its bridge to Mathlib's measure-level `InformationTheory.klDiv` by `withDensity`/Radon–Nikodym derivatives remains an archived unverified draft.
+- The path-counting/Jensen lower argument, family-specific policy expected-regret calculation, final restricted oracle-ratio comparison, and novelty review remain open proof/research tasks.
+- The unrestricted unknown-`(Q,B)` adaptation problem remains OPEN. PR #2 stays Draft.
