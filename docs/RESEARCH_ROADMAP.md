@@ -103,7 +103,7 @@ A restricted but nontrivial family-level problem has now been isolated in docs/P
 - [ ] Kernel-check the complete finite-horizon transcript induction.
 - [ ] Kernel-check the path-counting/Jensen lower bound.
 - [ ] Kernel-check the full oracle-competitive reduction, not only its final scalar product-bound corollary.
-- [ ] Obtain a clean green pinned-toolchain CI run for the new Lean module.
+- [x] Obtain a clean green pinned-toolchain CI run for the new Lean module (run 41284538301; exact scope recorded in PROGRESS_LOG.md).
 
 Acceptance: the restricted-family theorem is separately labelled from the general problem, and every Lean status is supported by a successful CI run.
 
