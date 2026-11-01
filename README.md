@@ -46,7 +46,7 @@ For that restricted family, the written gap-counting/Jensen lower argument and a
 =\Theta\!\left((T/A)^{1/6}\right).
 \]
 
-**Evidence boundary:** this lower/upper comparison is a mathematical write-up, not a complete Lean formalization. The full finite-history KL induction, the path-counting probability argument, the expected-regret calculation for the policy, and the final comparison with the oracle benchmark remain outside the kernel-checked development. The policy's upper bound uses the disclosed support-marker structure; it is not a general bounded-reward algorithm.
+**Evidence boundary:** this lower/upper comparison is a mathematical write-up, not a complete Lean formalization. The generic finite-horizon adaptive KL chain rule is now kernel-checked (see `BudgetFreeBandits/SequentialKL.lean`), but its concrete specialization to the point-spike reward kernels and the identity `KL(transcript)=log(5/3) E[N_a]` are not yet formalized end-to-end. The path-counting probability argument, policy expected-regret calculation, and final comparison with the oracle benchmark also remain written arguments. The policy's upper bound uses the disclosed support-marker structure; it is not a general bounded-reward algorithm.
 
 A second, genuinely non-degenerate signal distribution on \(\{3/4,7/8\}\) is derived in [docs/SEPARATED_SIGNAL_EXTENSION.md](docs/SEPARATED_SIGNAL_EXTENSION.md). It replaces the deterministic marker by a signal set disjoint from baseline support, but it still relies on perfect support separation and is not Lean-formalized.
 
@@ -86,12 +86,12 @@ The script runs before Lean in [\`.github/workflows/lean.yml\`](.github/workflow
 
 From a clean checkout:
 
-\`\`\`sh
+```sh
 lake exe cache get
 lake build
-\`\`\`
+```
 
-**Current PR-head CI: PASS.** The exact independent checks and pinned Lean/Mathlib build with `--wfail` both passed on current head `a16ee752b4fd5b66a22af33a78941b1efab6faed` in [GitHub Actions run 41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148). The four commits after the source-cleanup commit `8d777022` modify documentation only; the compiled Lean source, toolchain, Lake files, test script, and workflow are unchanged. A written proof, symbolic calculation, solver output, or AI explanation is not counted as Lean-verified until the pinned kernel build succeeds.
+**Current PR-head CI: PASS.** The exact independent checks and pinned Lean/Mathlib v4.36.0-rc2 build with `--wfail` both passed on source commit `8e7ae0dc10024ac0b7289dd397ea0a1a27324a37` in [GitHub Actions run 41300592276](https://github.com/2503140kcsk-eng/A/actions/runs/41300592276) and [run 41300588286](https://github.com/2503140kcsk-eng/A/actions/runs/41300588286). The root module imports the four verified modules, including `SequentialKL.lean`. Later commits to README and research documentation do not change the compiled source, toolchain, Lake files, script, or workflow. A written proof, symbolic calculation, solver output, or AI explanation is not counted as Lean-verified until the pinned kernel build succeeds.
 
 ## Evidence policy
 
