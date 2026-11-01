@@ -100,7 +100,7 @@ D_{\rm KL}(\mathbb P_0^T\Vert\mathbb P_{a,\tau}^T)
 =\log(5/3)\,\mathbb E_0[N_a(\tau,T)].
 }
 \]
-This is the rigorous cancellation mechanism for adaptive action selection. The added Lean module formalizes the Mathlib action-kernel cancellation and the two-stage chain-rule adapter, as well as the exact scalar mean, variance, and KL identities. The induction over the full finite history process is described here but is **not** marked kernel-checked until the finite-history model is separately added.
+This is the rigorous cancellation mechanism for adaptive action selection. The Lean modules formalize the Mathlib action-kernel cancellation, the two-stage one-round chain-rule adapter, and the exact scalar mean, variance, and KL identities. In addition, `BudgetFreeBandits/SequentialKL.lean` now kernel-checks the generic finite-horizon chain rule over recursively constructed complete histories and arbitrary history-dependent joint action/reward Markov kernels. The remaining unformalized step is to instantiate those generic kernels with this particular point-spike model and prove that each local KL equals `log(5/3)` times the baseline probability of selecting the changed arm.
 
 There is also a useful coupling. Generate a baseline reward \(Y\sim P_T\) and an independent Bernoulli mark \(Z\sim\mathrm{Ber}(\varepsilon)\). Under the alternative, return \(Y\) if \(Z=0\), and 1 if \(Z=1\). Until the first marked pull of the changed arm, the complete observable histories can be coupled identically. In particular, an unmarked pull of the changed arm does not reveal the change.
 
@@ -265,7 +265,7 @@ The policy is budget-unaware; the lower bound quantifies the cost of serving the
 - the stationary and changing classes have distinct positive variance budgets, \(Q_0=1/4096\) and \(Q=\Theta(T)\);
 - mean variation changes from \(B=0\) to \(B=1/4\);
 - the one-step KL contribution is exactly \(\log(5/3)\);
-- action-kernel cancellation and the generic two-stage KL chain rule are available in pinned Mathlib;
+- action-kernel cancellation, the one-round two-stage KL adapter, and the generic finite-horizon adaptive KL chain rule are kernel-checked in pinned Mathlib/Lean;
 - the gap-counting lower bound and a matching budget-unaware probe-and-commit policy give a \(\Theta((T/A)^{1/6})\) restricted-family oracle-competitive ratio.
 
 **Not established:**
@@ -274,7 +274,7 @@ The policy is budget-unaware; the lower bound quantifies the cost of serving the
 - a matching upper bound for the unrestricted noisy model;
 - a general novelty claim.
 
-This is a positive-noise obstruction and matching algorithm for a carefully disclosed two-class subproblem, **not** a solution of the unrestricted Section 6 open problem in arXiv:2610.26116v1. PR #2 must remain draft until the finite-history induction, gap-sum lemma, ratio algebra, pinned Lean CI, and independent novelty review are complete.
+This is a positive-noise obstruction and matching algorithm for a carefully disclosed two-class subproblem, **not** a solution of the unrestricted Section 6 open problem in arXiv:2610.26116v1. PR #2 must remain draft until the point-spike-specific local-KL specialization, gap-sum/path-counting lemma, expected-regret and ratio arguments are formalized, and the independent novelty review is complete.
 
 ## 8. Tool/repository roles
 
