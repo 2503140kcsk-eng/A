@@ -112,3 +112,36 @@ The repository script scripts/independent_checks.py uses only Python's standard 
 - 13,231 exact rational \((T,\tau)\) pairs checking the point-spike and separated-signal variance-budget envelopes, for \(64\le T\le240\).
 
 The local run passed. The same command is now placed before the Lean build in .github/workflows/lean.yml; the Actions result is the reproducible CI check. These finite tests are regression checks only, not proofs for all policies or horizons.
+
+## Check 7 — resumed exact symbolic verification
+
+Wolfram Language was run again on both finite contamination families. The returned exact values were:
+
+**Point-spike mixture** Q_T=(3/5)P_T+(2/5)δ_1:
+\[
+\mathbb E[Q_T]=\frac58,\qquad
+\operatorname{Var}(Q_T)=\frac3{32}+\frac35s_T^2,\qquad
+D_{\rm KL}(P_T\Vert Q_T)=\log\frac53.
+\]
+
+**Non-degenerate separated-signal mixture** Q̃_T=(3/7)P_T+(4/7)R, where R is uniform on {3/4,7/8}:
+\[
+\mathbb E[Q̃_T]=\frac58,\qquad
+\operatorname{Var}(Q̃_T)=\frac{11}{224}+\frac37s_T^2,\qquad
+D_{\rm KL}(P_T\Vert Q̃_T)=\log\frac73.
+\]
+
+The KL expressions were entered as the baseline-weighted sums over the two points in the support of P_T. This is the direction D_KL(P||Q); the reverse divergence is infinite because the alternative assigns positive probability outside the baseline support.
+
+**Scope:** Wolfram validates the displayed algebra for the supplied finite distributions. It does not verify the bandit coupling, the adaptive transcript identity, the pathwise gap-counting argument, or the regret bounds.
+
+## Check 8 — build boundary for incomplete formalizations
+
+The attempted measure-level KL bridge and finite-history sequential KL induction both failed pinned Lean compilation. They have been moved, without losing their source text, to:
+
+- docs/drafts/PositiveNoiseMeasureKL.lean.md
+- docs/drafts/SequentialKL.lean.md
+
+They are no longer Lean source files and are not part of the compiled library. The root import graph now includes only the three core modules with kernel-checked declarations. This is an explicit quarantine, not a claim that the archived proofs were completed.
+
+The remaining end-to-end proof obligations are unchanged: finite-history adaptive KL induction, the path-counting lower bound, the policy expected-regret calculation, and the final oracle-competitive ratio theorem.
