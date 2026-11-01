@@ -3,6 +3,7 @@ module
 public import BudgetFreeBandits.PositiveNoisePMF
 public import Mathlib.Probability.ProbabilityMassFunction.Basic
 public import Mathlib.Probability.ProbabilityMassFunction.Integrals
+public import Mathlib.MeasureTheory.Measure.WithDensity
 
 /-!
 # Measure-theoretic KL for the concrete finite PMFs
@@ -54,17 +55,19 @@ theorem spikeBase_toMeasure_eq_withDensity :
   apply Measure.ext
   intro s hs
   rw [withDensity_apply spikeDensity hs, lintegral_fintype]
-  rw [PMF.toMeasure_apply hs]
+  rw [PMF.toMeasure_apply spikeBasePMF hs]
   simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
-    spikeBasePMF, spikeAlternativePMF, PMF.toMeasure_apply_singleton,
-    Fin.sum_univ_succ, Finset.sum_univ_succ, tsum_fintype]
+    spikeBasePMF, spikeAlternativePMF, Fin.sum_univ_succ,
+    Finset.sum_univ_succ, tsum_fintype]
+  simp only [PMF.toMeasure_apply_singleton spikeAlternativePMF]
+
   ring_nf
 
 /-- The baseline measure is absolutely continuous with respect to the alternative. -/
 theorem spikeBase_toMeasure_absolutelyContinuous :
     spikeBaseMeasure ≪ spikeAlternativeMeasure := by
   rw [← spikeBase_toMeasure_eq_withDensity]
-  exact Measure.withDensity_absolutelyContinuous spikeAlternativeMeasure spikeDensity
+  exact withDensity_absolutelyContinuous spikeAlternativeMeasure spikeDensity
 
 /-- The Radon--Nikodym derivative is exactly 5/3 on the baseline support and 0
 on the marker, almost everywhere under the alternative law. -/
