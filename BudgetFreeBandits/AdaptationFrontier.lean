@@ -50,14 +50,19 @@ theorem theorem_5_1_algebraic_corollary
       mul_nonneg (le_of_lt hg) (by linarith)
     have hgu : g ≤ g * u / 4 := by nlinarith [hgap]
     have hmid : g * u / 4 ≤ r0 - g := by linarith
-    linarith
+    have hgu_nonneg : 0 ≤ g * u := mul_nonneg (le_of_lt hg) (by linarith)
+    have hsmallfactor : g * u / 12 ≤ g * u / 4 := by nlinarith [hgu_nonneg]
+    exact le_trans hsmallfactor (le_trans hmid hstationary)
   · have hsmall : r0 < g * u / 2 := lt_of_not_ge hlarge
+    have hscale : g * u / 2 ≤ g * u ^ 2 / 2 := by
+      have hmul : 0 ≤ g * (u ^ 2 - u) :=
+        mul_nonneg (le_of_lt hg) (by nlinarith [hu])
+      nlinarith [hmul]
     have hcondition : r0 ≤ g * n * q / 2 := by
-      have hscale : g * u / 2 ≤ g * u ^ 2 / 2 := by
-        have hmul : 0 ≤ g * (u ^ 2 - u) :=
-          mul_nonneg (le_of_lt hg) (by nlinarith [hu])
-        nlinarith [hmul]
-      nlinarith [hscale, hu_sq]
+      calc
+        r0 < g * u / 2 := hsmall
+        _ ≤ g * u ^ 2 / 2 := hscale
+        _ = g * n * q / 2 := by rw [hu_sq]; ring
     have hden : 0 < 8 * (r0 + g * n) := by positivity
     have hfactor : 0 ≤ g * u / 12 := by positivity
     have hgn : g * n ≤ g * u :=
