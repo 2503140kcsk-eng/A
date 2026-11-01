@@ -47,27 +47,37 @@ The plan assumes no paid model APIs, paid computation, paid storage, or propriet
 The upstream repositories are dependencies or reference tools only. This project has no write permission to those upstream repositories; project code and proof artifacts are committed to 2503140kcsk-eng/A.
 
 
-## Execution record for the 1 November 2026 research pass
+## Execution record — 1 November 2026, resumed pass
 
-| Component | Actually exercised | Evidence boundary |
+| Component | Actually exercised in this pass | Evidence boundary |
 |---|---|---|
-| GitHub connector | Re-read PR #2, all core Lean files, project workflow, and research notes; committed PMF, measure-KL bridge draft, exact-check script, and workflow changes. | Git commits and Actions runs are visible in the branch history. |
-| GitHub Actions / Lean | Verified the PMF module in earlier pinned v4.36.0-rc2 --wfail runs. The newer measure-level KL bridge is being built separately; it is not called verified until its current workflow passes. | See the live Actions run linked from PR #2. |
-| Context7 | Resolved Mathlib4 and queried the finite-PMF integration API. | API discovery only; the exact pinned Mathlib source was also inspected. |
-| Wolfram | Evaluated exact mean, variance and KL expressions for the point-spike family; also checked variance-envelope bounds symbolically. | Symbolic checks validate the supplied algebra, not the bandit probability proof. |
-| Python standard library | Ran exact-rational budget sweeps; enumerated 200 history-adaptive randomized policy kernels for horizons 1–5; checked 53,516 baseline transcripts; exhaustively checked 2,046 pull subsets for gap-counting with q <= 10. | This is a finite independent regression test, not a universal theorem. Reproduction: python3 scripts/independent_checks.py. |
-| Parallel Search | Retrieved primary-source abstracts for the 19 October 2026 paper and established change-detection / variation-adaptation prior work. | Literature discovery, not proof verification. |
-| Sider Scholar | Retrieved the exact arXiv record/abstract for arXiv:2610.26116 and searched related nonstationary-bandit work. | The search is not an exhaustive novelty proof. |
+| GitHub connector | Read PR #2 and branch sources; updated the root import graph; archived two failing proof drafts without deleting their contents; updated README, progress, and research documentation. | Mutations are visible in branch commits; the PR remains Draft. |
+| GitHub Actions / Lean | Ran pinned Lean v4.36.0-rc2 builds. The finite PMF module had earlier passing `--wfail` runs; recent builds exposed that two incomplete Lean files were part of Lake's default module build even though they were not imported by the root. They are now archived as Markdown drafts and removed from the compiled source tree. | Current branch-head CI is the acceptance test for the cleaned build; only successful run IDs are to be called PASS. |
+| Mathlib4 | Used the pinned Mathlib APIs in the core Lean files and inspected pinned source for `PMF.toMeasure`, `toMeasure_apply`, Radon–Nikodym and KL declarations. | Only declarations in the three compiled source modules count as verified. The measure-level KL and sequential-history inductions are not in the compiled source. |
+| Context7 | Resolved Mathlib4 and queried finite PMF integration, `PMF.toMeasure`, `rnDeriv`, `withDensity`, and KL APIs. | Context7's retrieved examples include current `master`; version-sensitive names were cross-checked against the exact pinned v4.36.0-rc2 source. |
+| Wolfram | Evaluated exact point-spike and separated-signal means, variances, and forward KL expressions. | It checked supplied algebra: point-spike mean `5/8`, variance `3/32 + 3 s^2/5`, KL `log(5/3)`; separated-signal mean `5/8`, variance `11/224 + 3 s^2/7`, KL `log(7/3)`. It does not prove the probability or adaptation arguments. |
+| Parallel Search | Retrieved the 19 October 2026 arXiv paper's primary HTML and searched for prior work on variation budgets, bandit adaptation, and change detection. | Source discovery and theorem-scope comparison only. |
+| Sider Scholar | Retrieved the exact arXiv:2610.26116v1 record and queried related nonstationary-bandit literature. | The results are not an exhaustive novelty review. The result viewer was exposed by the Scholar search response. |
+| Python standard library | The repository CI runs `scripts/independent_checks.py`: 200 randomized nonanticipating history-dependent policy kernels; 53,516 baseline transcripts; 2,046 pull-time subsets; and 13,231 exact rational `(T,tau)` budget pairs. | Finite regression checks only, not a universal theorem. The authoritative reproducible status is the GitHub Actions run. |
 
-The following user-supplied repositories have **assigned roles but were not executed as standalone tools in this environment**:
+## Upstream repository roles and actual execution boundaries
 
-- **SymPy:** exact symbolic simplification; not run in this pass (the reproducible checker uses Python Fraction instead).
-- **SageMath:** exact LP and finite policy-game enumeration; not run.
-- **cvc5:** SMT counterexample search; not run.
-- **GAP:** arm-symmetry/orbit reduction; not run.
-- **Macaulay2:** algebraic-geometric elimination if a polynomial-ideal reduction appears; not needed for the present finite probability construction and not run.
-- **LeanDojo-v2:** theorem/source retrieval and premise search; not run as a proof checker.
-- **Naproche:** prose-proof checking; not run.
-- **Mathlib4:** used through pinned Lean CI and direct source inspection.
+| Repository | Assigned role in this project | Executed as a standalone solver in this pass? |
+|---|---|---|
+| `leanprover-community/mathlib4` | Primary Lean mathematics: finite PMFs, measures, KL divergence, kernels, and real-analysis lemmas. | **Yes**, through pinned Lean/Mathlib CI and direct source inspection. |
+| `lean-dojo/LeanDojo-v2` | Retrieve declarations, theorem premises, and search for formalization patterns; use it to propose proof routes, never as a proof checker. | **No**. |
+| `cvc5/cvc5` | SMT counterexample search for finite rational/real constraints, rate inequalities, and candidate encodings; keep logic/options/certificates. | **No**. |
+| `sympy/sympy` | Exact rational simplification and factorization. | **No**. The checked script uses Python `Fraction`; Wolfram handled the symbolic identities. |
+| `sagemath/sage` | Exact LP and small rational zero-sum game enumeration for finite-horizon policy relaxations. | **No**. |
+| `gap-system/gap` | Symmetry groups and orbit reduction for arm-permutation-equivalent finite environments. | **No**. |
+| `Macaulay2/M2` | Optional elimination/commutative algebra if a polynomial-ideal reduction appears; not needed for this finite probability calculation. | **No**. |
+| `naproche/naproche` | Independent checking of isolated prose/classical arguments; its result would not replace Lean. | **No**. |
 
-No paid API, hosted Sage notebook, commercial solver, paid compute, or deployment was used. GitHub Actions account quota/remaining minutes were not observable; the workflow uses the repository's standard hosted CI.
+No paid API, paid hosted notebook, commercial solver, paid compute, or deployment was used. GitHub Actions account quota/remaining minutes were not observable. The upstream repositories are references/dependencies; no changes were written to them.
+
+## Current acceptance boundary
+
+- The compiled Lean library contains only `AdaptationFrontier.lean`, `PositiveNoiseAdaptation.lean`, and `PositiveNoisePMF.lean`, reachable from `BudgetFreeBandits.lean`.
+- `PositiveNoiseMeasureKL.lean` and `SequentialKL.lean` are archived under `docs/drafts/` as noncompiled Markdown. Their contents are preserved; their theorem statements are not verified.
+- The full finite-history KL identity, path-counting lower proof, policy expected-regret proof, and final restricted ratio comparison remain mathematical write-ups rather than end-to-end kernel-checked theorems.
+- The PR must remain Draft until those proofs are formalized and independently reviewed for novelty.
