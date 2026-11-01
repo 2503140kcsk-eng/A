@@ -56,7 +56,6 @@ theorem spikeBase_toMeasure_eq_withDensity :
   intro s hs
   rw [withDensity_apply spikeDensity hs, ← lintegral_indicator hs, lintegral_fintype]
   rw [PMF.toMeasure_apply spikeBasePMF hs]
-  simp only [Measure.restrict_apply (MeasurableSet.singleton _)]
   by_cases h0 : (0 : Fin 3) ∈ s
   · by_cases h1 : (1 : Fin 3) ∈ s <;>
       simp [spikeBaseMeasure, spikeAlternativeMeasure, spikeDensity,
@@ -131,12 +130,14 @@ theorem spike_measure_kl_exact :
           rw [ENNReal.toReal_ofReal hx]
           have hcoef :
               (3 : ℝ≥0∞) / 10 = ENNReal.ofReal ((3 : ℝ) / 10) := by
-            norm_num [ENNReal.ofReal_eq_coe_nnreal]
+            rw [ENNReal.ofReal_eq_coe_nnreal (by norm_num : (0 : ℝ) ≤ 3 / 10)]
+            norm_num
           have htwo : (2 : ℝ≥0∞) = ENNReal.ofReal (2 : ℝ) := by
             norm_num
           have hmark :
               (2 : ℝ≥0∞) / 5 = ENNReal.ofReal ((2 : ℝ) / 5) := by
-            norm_num [ENNReal.ofReal_eq_coe_nnreal]
+            rw [ENNReal.ofReal_eq_coe_nnreal (by norm_num : (0 : ℝ) ≤ 2 / 5)]
+            norm_num
           rw [hcoef, hmark, htwo, ← ENNReal.ofReal_mul hA,
             ← ENNReal.ofReal_mul (mul_nonneg hA (by norm_num : (0 : ℝ) ≤ 3 / 10)),
             ← ENNReal.ofReal_add
