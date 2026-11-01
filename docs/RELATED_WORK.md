@@ -69,3 +69,8 @@ For every proposed theorem:
 9. Record what is already solved and explicitly state the remaining gap.
 
 An arXiv preprint is evidence of a public research claim, not peer-reviewed consensus. Novelty status is provisional until independent literature review.
+
+
+## Additional scope clarification from the positive-noise family
+
+The new construction is a **restricted-family** separation relative to the supplied-budget oracle rate in arXiv:2610.26116v1. Its novelty is not the existence of parameter-free nonstationary bandit algorithms, nor a generic switching-count impossibility. Auer–Gajane–Ortner (2019), Chen–Lee–Luo–Wei (2019), and Wei–Luo (2021) already provide prior-free adaptation in related stochastic/contextual/RL models. The open distinction to audit is the simultaneous unknown variance-envelope \(Q\) and mean-variation \(B\) profile for the exact selected-arm dynamic-best-arm model, beyond the special identifiable-spike family. The restricted-family upper algorithm uses a known signal structure and is not an unrestricted solution.
