@@ -212,7 +212,7 @@ Combining these inequalities with \(p=(A/T)^{5/6}\), \(n\le A\), \(g=1/8\), and 
 \boxed{
 \sup_{\nu\in\mathcal F}
 \frac{\mathbb E_\nu[R_T]}{\Xi(A,T;Q(\nu),B(\nu))}
-\le3\left(\frac TA\right)^{1/6}.
+\le4\left(\frac TA\right)^{1/6}.
 }
 \tag{PN-UPPER}
 \]
