@@ -15,6 +15,8 @@ competitive-ratio reduction from the stated frontier inequality.
 
 namespace BudgetFreeBandits
 
+noncomputable section
+
 open MeasureTheory ProbabilityTheory
 
 /-- Mean of the pre-change challenger distribution. -/
@@ -39,7 +41,6 @@ def spikeAlternativeVariance (s2 : ℝ) : ℝ :=
 theorem spike_alternative_variance_exact (s2 : ℝ) :
     spikeAlternativeVariance s2 = 3 / 32 + (3 / 5) * s2 := by
   norm_num [spikeAlternativeVariance, spikeProbability, spikeBaseMean]
-  ring
 
 /--
 The one-step KL expression: the base law puts mass 1/2 on each of two
@@ -76,7 +77,7 @@ theorem spike_baseline_budget_exact {T : ℝ} (hT : 0 < T) :
   field_simp [ne_of_gt hT]
   norm_num
 
-theorem spike_alternative_variance_lower {T : ℝ} :
+theorem spike_alternative_variance_lower {T : ℝ} (hT : 0 < T) :
     3 / 32 ≤ spikeAlternativeVariance (spikeNoiseVariance T) := by
   rw [spike_alternative_variance_exact]
   have hnonneg : 0 ≤ spikeNoiseVariance T := by
@@ -87,17 +88,12 @@ theorem spike_alternative_variance_lower {T : ℝ} :
 theorem spike_alternative_variance_upper {T : ℝ} (hT : 32 ≤ T) :
     spikeAlternativeVariance (spikeNoiseVariance T) ≤ 1 / 8 := by
   rw [spike_alternative_variance_exact]
-  have hTpos : 0 < T := by linarith
-  have hden : 0 < 4096 * T := by positivity
-  have hsmall : spikeNoiseVariance T ≤ 1 / (4096 * 32) := by
+  have hsmall : spikeNoiseVariance T ≤ 1 / 131072 := by
     unfold spikeNoiseVariance
-    rw [div_le_iff₀ hden]
+    rw [div_le_iff₀ (by positivity : 0 < 4096 * T)]
     norm_num
     nlinarith
-  have hscaled := mul_le_mul_of_nonneg_left hsmall (by norm_num : (0 : ℝ) ≤ 3 / 5)
-  norm_num at hscaled
-  norm_num
-  nlinarith [hscaled]
+  nlinarith [hsmall]
 
 /-- Exact variance-envelope budget of an early one-change alternative. -/
 def spikeAlternativeBudget (T tau : ℝ) : ℝ :=
@@ -119,12 +115,14 @@ theorem spike_alternative_budget_bounds
     have hvar := spike_alternative_variance_upper hT
     have hbase_eq : spikeNoiseVariance T ≤
         spikeAlternativeVariance (spikeNoiseVariance T) := by
-      rw [spike_alternative_variance_exact]
-      nlinarith [hbase_nonneg]
+      unfold spikeNoiseVariance
+      rw [div_le_iff₀ (by positivity : 0 < 4096 * T)]
+      norm_num
+      nlinarith
     exact le_trans hbase_eq hvar
   have halt_lo :
       3 / 32 ≤ spikeAlternativeVariance (spikeNoiseVariance T) :=
-    spike_alternative_variance_lower
+    spike_alternative_variance_lower hTpos
   have halt_hi :
       spikeAlternativeVariance (spikeNoiseVariance T) ≤ 1 / 8 :=
     spike_alternative_variance_upper hT
@@ -138,6 +136,7 @@ theorem spike_alternative_budget_bounds
         (T - tau + 1) * (3 / 32) ≤
           (T - tau + 1) * spikeAlternativeVariance (spikeNoiseVariance T) :=
       mul_le_mul_of_nonneg_left halt_lo hcoeff2
+    unfold spikeAlternativeBudget
     nlinarith [hfirst, hsecond, hduration]
   · have hfirst :
         (tau - 1) * spikeNoiseVariance T ≤ (tau - 1) * (1 / 8) :=
@@ -221,8 +220,7 @@ theorem positive_noise_competitive_ratio_lower
       positivity
     nlinarith
   have hTgeA : A ≤ T := by linarith
-  have hfactor : 0 ≤ A * (T - A) * (T + A) :=
-    mul_nonneg (le_of_lt hApos) (mul_nonneg (by linarith) (by linarith))
+  have hfactor : 0 ≤ A * (T - A) * (T + A) := by positivity
   have hAcube : A ^ 3 ≤ scaleU ^ 3 := by
     rw [hscale_cube]
     nlinarith [hfactor]
