@@ -13,7 +13,7 @@ Under the baseline environment P_0:
 - arm 1 has Bernoulli(1/2) rewards at every round;
 - every challenger arm a in {2,...,A} has Bernoulli(1/2-g) rewards at every round.
 
-For a fixed change time tau in {1,...,T} and challenger a:
+For a fixed change time tau in {2,...,T} and challenger a:
 - all rewards match P_0 before tau;
 - from tau through T, arm a has Bernoulli(1/2+g) rewards;
 - all other arm distributions stay unchanged.
