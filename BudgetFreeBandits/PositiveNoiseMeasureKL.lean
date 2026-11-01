@@ -63,7 +63,7 @@ theorem spikeBase_rnDeriv_eq_density :
     (PMF.toMeasure spikeBasePMF).rnDeriv (PMF.toMeasure spikeAlternativePMF)
       =ᵐ[PMF.toMeasure spikeAlternativePMF] spikeDensity := by
   rw [← spikeBase_toMeasure_eq_withDensity]
-  have htop : ∀ᵐ i ∂PMF.toMeasure spikeAlternativePMF, spikeDensity i ≠ ∞ :=
+  have htop : ∀ᵐ i ∂(PMF.toMeasure spikeAlternativePMF), spikeDensity i ≠ ∞ :=
     ae_of_all _ (by intro i; fin_cases i <;> simp [spikeDensity])
   have h := Measure.rnDeriv_withDensity_left
     (μ := PMF.toMeasure spikeAlternativePMF)
@@ -71,13 +71,13 @@ theorem spikeBase_rnDeriv_eq_density :
     (f := spikeDensity)
     (by fun_prop)
     htop
-  filter_upwards [h, Measure.rnDeriv_self PMF.toMeasure spikeAlternativePMF] with i hi hs
+  filter_upwards [h, Measure.rnDeriv_self (PMF.toMeasure spikeAlternativePMF)] with i hi hs
   rw [hi, hs]
   simp
 
 /-- Actual measure-theoretic KL, as defined by Mathlib, is the exact log(5/3). -/
 theorem spike_measure_kl_exact :
-    InformationTheory.klDiv PMF.toMeasure spikeBasePMF PMF.toMeasure spikeAlternativePMF =
+    InformationTheory.klDiv (PMF.toMeasure spikeBasePMF) (PMF.toMeasure spikeAlternativePMF) =
       ENNReal.ofReal (Real.log (5 / 3)) := by
   rw [InformationTheory.klDiv_eq_lintegral_klFun_of_ac
     spikeBase_toMeasure_absolutelyContinuous]
@@ -86,7 +86,7 @@ theorem spike_measure_kl_exact :
         (InformationTheory.klFun
           ((PMF.toMeasure spikeBasePMF).rnDeriv
             (PMF.toMeasure spikeAlternativePMF) i).toReal)
-        ∂PMF.toMeasure spikeAlternativePMF)
+        ∂(PMF.toMeasure spikeAlternativePMF))
       =
       ∫⁻ i, ENNReal.ofReal
         (InformationTheory.klFun (spikeDensity i).toReal)
@@ -106,8 +106,8 @@ theorem spike_measure_kl_exact :
 
 /-- The real-valued KL obtained from Mathlib's measure KL is log(5/3). -/
 theorem spike_measure_kl_toReal_exact :
-    (InformationTheory.klDiv PMF.toMeasure spikeBasePMF
-      PMF.toMeasure spikeAlternativePMF).toReal = Real.log (5 / 3) := by
+    (InformationTheory.klDiv (PMF.toMeasure spikeBasePMF)
+      (PMF.toMeasure spikeAlternativePMF)).toReal = Real.log (5 / 3) := by
   rw [spike_measure_kl_exact, ENNReal.toReal_ofReal]
   exact Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 5 / 3)
 
