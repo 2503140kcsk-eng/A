@@ -33,6 +33,7 @@ variable {A : Type uA} {X : Type uX}
   [MeasurableSpace A] [MeasurableSpace X]
 
 /-- The recursively chosen product measurable space on every finite-history type. -/
+@[instance_reducible]
 def sequentialHistoryMeasurableSpace (t : Nat) :
     MeasurableSpace (SequentialHistory A X t) :=
   match t with
@@ -68,12 +69,12 @@ theorem sequentialTranscript_isProbability
   intro t
   induction t with
   | zero =>
-      simpa [sequentialTranscript] using
+      simpa [sequentialTranscript, sequentialHistoryMeasurableSpace] using
         (inferInstance : IsProbabilityMeasure (Measure.dirac PUnit.unit))
   | succ t ih =>
       haveI : IsProbabilityMeasure (sequentialTranscript step hStep t) := ih
       haveI : IsMarkovKernel (step t) := hStep t
-      simpa [sequentialTranscript] using
+      simpa [sequentialTranscript, sequentialHistoryMeasurableSpace] using
         (inferInstance : IsProbabilityMeasure
           (sequentialTranscript step hStep t ⊗ₘ step t))
 
@@ -112,7 +113,7 @@ theorem sequentialTranscript_kl_chain_rule
   intro t
   induction t with
   | zero =>
-      simp [sequentialTranscript, sequentialLocalKL, InformationTheory.klDiv_self]
+      simp [sequentialTranscript, sequentialLocalKL, sequentialHistoryMeasurableSpace, InformationTheory.klDiv_self]
   | succ t ih =>
       haveI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
         sequentialTranscript_isProbability baseStep hBase t
