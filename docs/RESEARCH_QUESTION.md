@@ -40,11 +40,17 @@ Here the minimax policy may use the supplied budgets. For Q > 0 the paper states
 Let Pi(A,T) be policies whose inputs include A,T, but not Q,B, and which are fixed once for the full family of environments. For one policy pi, define
 R_pi(Q,B) = sup over environments with V_T <= Q and Delta_T <= B of E[R_T].
 
-The project seeks a sharp description of the attainable **profile** (R_pi(Q,B)) over one and the same policy, rather than optimizing a different policy separately for each budget pair. A natural benchmark is the supplied-budget oracle profile Xi(A,T;Q,B). However, it is already known that a single policy cannot match all supplied-budget deterministic oracle rates up to only logarithmic factors. Therefore the project must determine the correct adaptation penalty; it must not assume that the answer is polylogarithmic.
+The project seeks a sharp description of the attainable **profile** (R_pi(Q,B)) over one and the same policy, rather than optimizing a different policy separately for each budget pair.
+
+Formally, let
+P_{A,T} = { (Q,B) -> R_pi(Q,B) : pi in Pi(A,T) }.
+Order profiles pointwise: f <= g when f(Q,B) <= g(Q,B) for every admissible pair (Q,B). The target is to characterize the non-dominated (Pareto-minimal) boundary of P_{A,T}, or prove a matching outer bound on that boundary.
+
+This distinction matters. The pointwise infimum inf_pi R_pi(Q,B) can select a different policy for every budget pair and therefore does not solve the one-policy adaptation problem. The oracle benchmark Xi(A,T;Q,B) is a useful reference, but it is already known that one policy cannot match every supplied-budget deterministic oracle rate up to only logarithmic factors. The correct adaptation penalty must be determined rather than assumed to be polylogarithmic.
 
 ### Main research question
 
-For the unrestricted noisy model above, what is the minimax attainable tradeoff between (i) stationary/low-variance guarantees and (ii) dynamic/variation-sensitive guarantees of a single policy not told Q or B? Can an explicit policy attain this profile up to universal constants or logarithms, or is there a stronger information-theoretic obstruction?
+For the unrestricted noisy model above, what is the minimax attainable tradeoff between (i) stationary/low-variance guarantees and (ii) dynamic/variation-sensitive guarantees of a single policy not told Q or B? Can an explicit policy attain the Pareto boundary up to universal constants or logarithms, or is there a stronger information-theoretic obstruction?
 
 This is a two-sided target: an impossibility theorem is a valid solution if it closes the stated profile problem.
 
@@ -63,7 +69,13 @@ The first Lean milestone derives an algebraic corollary. Write u=sqrt(nq). If u^
 
 This formal corollary is a **derived consequence of a published preprint theorem**, not a new bandit lower bound. The probability/change-of-measure proof of Theorem 5.1 is not yet formalized in this repository.
 
-## 5. Novelty guardrails
+## 5. Positive-noise lower-bound direction
+
+A candidate Bernoulli one-change construction with variance budget Q=T/4 and variation budget B=2g is recorded in [NOISY_LOWER_BOUND_CANDIDATE.md](NOISY_LOWER_BOUND_CANDIDATE.md). It uses a KL chain-rule argument and Pinsker's inequality to seek a lower bound for policies with small baseline regret.
+
+This is explicitly a candidate derivation, not a formally verified or novelty-checked theorem. Its role is to provide the first positive-variance attack on the unrestricted noisy problem.
+
+## 6. Novelty guardrails
 
 The project must not claim these as new:
 
@@ -74,7 +86,7 @@ The project must not claim these as new:
 
 The novelty candidate is specifically the unrestricted noisy selected-arm-feedback model with both variance and mean-variation budgets unknown, and a matching description of the complete attainable adaptation profile.
 
-## 6. What would count as a solution
+## 7. What would count as a solution
 
 At least one outcome is required:
 
