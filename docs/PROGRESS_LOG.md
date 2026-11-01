@@ -31,6 +31,8 @@
 - Corrected the change time to (\tau\in\{2,\ldots,T\}), because the project's variation budget excludes an initial-vector change.
 - In this family, the variance envelope is (Q=T/4) and a single consecutive mean change has (B=2g).
 - **Not verified:** the KL chain-rule argument for arbitrary adaptive randomized policies still needs a careful measure-theoretic proof, formalization, and novelty audit. The candidate is not counted as a theorem.
+- Wolfram symbolic checks found no counterexample to the algebraic denominator estimate or the bound (d_g\leq32g^2/3) on (0<g\leq1/4); exact inputs/outputs are recorded in `docs/EXPERIMENT_LOG.md`.
+- **Important:** this two-environment KL inequality alone does not prove an adaptation penalty, because a policy that knows Q and B still may not know the improved arm or change time.
 
 ### Current research status
 - The unrestricted noisy adaptation problem remains **OPEN / NOT SOLVED**.
