@@ -137,16 +137,30 @@ The KL expressions were entered as the baseline-weighted sums over the two point
 
 ## Check 8 — build boundary for incomplete formalizations
 
-The attempted measure-level KL bridge and finite-history sequential KL induction both failed pinned Lean compilation. They have been moved, without losing their source text, to:
+The first measure-level KL attempt and first finite-history sequential KL attempt both failed pinned Lean compilation. Their complete source text was preserved as:
 
 - docs/drafts/PositiveNoiseMeasureKL.lean.md
 - docs/drafts/SequentialKL.lean.md
 
-They are no longer Lean source files and are not part of the compiled library. The root import graph now includes only the three core modules with kernel-checked declarations. This is an explicit quarantine, not a claim that the archived proofs were completed.
-
-The remaining end-to-end proof obligations are unchanged: finite-history adaptive KL induction, the path-counting lower bound, the policy expected-regret calculation, and the final oracle-competitive ratio theorem.
+The measure-level KL bridge remains unverified and noncompiled. The first sequential-history attempt was superseded by a new `BudgetFreeBandits/SequentialKL.lean` proof using an explicitly recursive measurable space; that replacement is now imported by the root and passes pinned Lean/Mathlib CI (see Check 10 below). The remaining end-to-end proof obligations are the point-spike-specific local-KL specialization, path-counting lower bound, policy expected-regret calculation, and final oracle-competitive ratio theorem.
 ## Check 9 — current-head reproducible CI
 
 Pinned GitHub Actions run [41299670148](https://github.com/2503140kcsk-eng/A/actions/runs/41299670148) completed successfully on current PR head `a16ee752b4fd5b66a22af33a78941b1efab6faed`. Both the exact independent finite-check step and the Lean/Mathlib v4.36.0-rc2 build with `--wfail` succeeded.
 
 The four commits between source-cleanup commit `8d77702299c2c46fe3cd33b2e517efcc34d8b0d6` and this head are documentation-only. This CI pass verifies the compiled formal library and the finite regression script; it does not change the status of the archived measure-level KL or sequential-history proof drafts, nor does it kernel-check the written bandit lower/upper arguments.
+## Check 10 — generic finite-horizon adaptive KL chain rule verified
+
+`BudgetFreeBandits/SequentialKL.lean` now defines recursively measurable complete histories and a one-round Markov kernel from the entire history to the next joint action/reward pair. For two such sequential processes, it proves
+
+\[
+D_{\\mathrm{KL}}(\\mathbb P_0^t\\Vert\\mathbb P_1^t)
+=\\sum_{i=0}^{t-1}D_{\\mathrm{KL}}(\\mathbb P_0^i\\otimes K_i\\Vert\\mathbb P_0^i\\otimes L_i),
+\]
+
+where (K_i,L_i) are the respective next-step kernels and each local KL is evaluated under the baseline history law. This covers arbitrary history-dependent randomized policies when their next action/reward transition is encoded by such a Markov kernel.
+
+The proof uses Mathlib's `InformationTheory.klDiv_compProd_eq_add`, proves the transcript laws are probability measures, and is imported by `BudgetFreeBandits.lean`. The module contains no `sorry`, `admit`, or added axiom.
+
+Pinned CI source commit `8e7ae0dc10024ac0b7289dd397ea0a1a27324a37` passed in [run 41300592276](https://github.com/2503140kcsk-eng/A/actions/runs/41300592276) and [run 41300588286](https://github.com/2503140kcsk-eng/A/actions/runs/41300588286). Both independent checks and Lean/Mathlib `--wfail` builds succeeded.
+
+**Limit:** this general chain rule does not yet prove the point-spike-specific identity in which each local conditional KL reduces to (log(5/3)) times the baseline probability of selecting the changed arm. That still needs a formal kernel factorization with the shared action policy and reward kernels. The discrete PMF-to-measure KL bridge also remains a separate unverified draft.
