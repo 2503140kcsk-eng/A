@@ -59,7 +59,7 @@ theorem sequentialTranscript_isProbability
   | succ t ih =>
       haveI : IsProbabilityMeasure (sequentialTranscript step hStep t) := ih
       haveI : IsMarkovKernel (step t) := hStep t
-      simpa [sequentialTranscript, sequentialHistoryMeasurableSpace] using
+      simpa [sequentialTranscript] using
         (inferInstance : IsProbabilityMeasure
           (sequentialTranscript step hStep t ⊗ₘ step t))
 
@@ -98,7 +98,7 @@ theorem sequentialTranscript_kl_chain_rule
   intro t
   induction t with
   | zero =>
-      simp [sequentialTranscript, sequentialLocalKL, sequentialHistoryMeasurableSpace, InformationTheory.klDiv_self]
+      simp [sequentialTranscript, sequentialLocalKL, InformationTheory.klDiv_self]
   | succ t ih =>
       haveI : IsProbabilityMeasure (sequentialTranscript baseStep hBase t) :=
         sequentialTranscript_isProbability baseStep hBase t
