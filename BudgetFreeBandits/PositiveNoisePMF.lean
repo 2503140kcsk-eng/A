@@ -4,6 +4,8 @@ public import Mathlib
 public import Mathlib.Probability.ProbabilityMassFunction.Integrals
 public import Mathlib.InformationTheory.KullbackLeibler.ChainRule
 
+public section
+
 /-!
 # Concrete finite PMFs for the positive-noise construction
 
