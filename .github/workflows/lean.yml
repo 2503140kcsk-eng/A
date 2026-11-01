@@ -5,9 +5,21 @@ on:
     branches:
       - main
       - "research/**"
+    paths:
+      - "**/*.lean"
+      - "lakefile.lean"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - ".github/workflows/lean.yml"
   pull_request:
     branches:
       - main
+    paths:
+      - "**/*.lean"
+      - "lakefile.lean"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - ".github/workflows/lean.yml"
   workflow_dispatch:
 
 permissions:
