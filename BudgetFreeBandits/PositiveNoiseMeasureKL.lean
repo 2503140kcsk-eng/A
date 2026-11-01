@@ -1,6 +1,8 @@
 module
 
 public import BudgetFreeBandits.PositiveNoisePMF
+public import Mathlib.Probability.ProbabilityMassFunction.Basic
+public import Mathlib.Probability.ProbabilityMassFunction.Integrals
 
 /-!
 # Measure-theoretic KL for the concrete finite PMFs
