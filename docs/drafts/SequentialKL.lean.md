@@ -1,17 +1,17 @@
 # Archived Lean draft: finite-history adaptive KL chain rule
 
-**Status: NOT VERIFIED — deliberately excluded from the compiled Lean library.**
+**Status: SUPERSEDED HISTORICAL ATTEMPT — not the current proof.**
 
 This draft defines recursively generated action/reward histories and attempts an induction using Mathlib's composition-product KL chain rule.
 
-Latest known failure (pinned Lean v4.36.0-rc2):
+Historical failure from the first attempt (pinned Lean v4.36.0-rc2):
 - the product history type produced by `Measure.compProd` does not reduce to the recursive `SequentialHistory (t+1)` in the final induction;
 - the probability-measure instance proofs and base case simplification need repair;
 - the theorem is not currently a kernel-checked finite-horizon adaptive KL statement.
 
-The generic one-round shared-action-kernel cancellation and two-stage decomposition remain available in `PositiveNoiseAdaptation.lean`. This draft is not evidence that the all-history induction has been completed.
+The first version did not complete the all-history induction. It was superseded by the kernel-verified `BudgetFreeBandits/SequentialKL.lean`, which defines recursive measurable histories and proves the finite-horizon KL chain rule for arbitrary history-dependent Markov transition kernels. The current source is imported by `BudgetFreeBandits.lean`; see the README and progress log.
 
-Do not import this file or count its theorem statements as verified. Re-enable only after exact pinned CI passes with `--wfail`.
+Do not import this archived first attempt. The replacement source module has passed pinned Lean/Mathlib CI with `--wfail` in runs 41300592276 and 41300588286.
 
 ```lean
 module
