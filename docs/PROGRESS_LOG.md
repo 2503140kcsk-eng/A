@@ -118,3 +118,29 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 - The arXiv 2610.26116v1 record and related prior-work sources were rechecked. Gap-counting, coupling-until-detection, Jensen averaging, and probe/commit monitoring are not claimed as new techniques. The current candidate extension is only to positive-variance finite distributions with a perfectly separating signal event.
 - The non-degenerate separated-signal construction remains a mathematical note and has not yet been formalized in Lean.
 - PR #2 has been returned to **Draft** to match its own acceptance criteria. It is not ready to merge.
+
+## 2026-11-01 — resumed after interrupted measure-KL work
+
+### Failure diagnosis and quarantine
+- The measure-level KL bridge and finite-history sequential KL induction both produced real Lean errors under the pinned Lean v4.36.0-rc2 build. The measure-level bridge still had unresolved finite `withDensity` indicator/PMF-mass goals, ENNReal cast equalities for `3/10` and `2/5`, and final `ofReal` KL algebra. The sequential-history theorem still had an unresolved product-history type reduction and proof obligations in probability-measure instances/base cases.
+- Neither failed theorem was weakened with `sorry`, `admit`, or an axiom. Their complete source text was preserved as `docs/drafts/PositiveNoiseMeasureKL.lean.md` and `docs/drafts/SequentialKL.lean.md`.
+- Removed the two `.lean` files from the compiled source tree and removed the measure-KL draft from the root import file. The compiled root now imports only `AdaptationFrontier`, `PositiveNoiseAdaptation`, and `PositiveNoisePMF`.
+- Updated README, PR scope/status, experiment log, and tool-role records to distinguish verified modules from written mathematical arguments and archived Lean drafts.
+
+### Clean pinned verification
+- On source-cleanup commit `8d77702299c2c46fe3cd33b2e517efcc34d8b0d6`, GitHub Actions runs [41299399659](https://github.com/2503140kcsk-eng/A/actions/runs/41299399659) and [41299395303](https://github.com/2503140kcsk-eng/A/actions/runs/41299395303) both completed successfully.
+- Both runs passed the exact independent finite checks step and the Lean/Mathlib build step with `--wfail` under the pinned Lean `v4.36.0-rc2` and Mathlib `v4.36.0-rc2`.
+- Other workflows triggered by earlier sequential file commits also completed successfully: [41299394624](https://github.com/2503140kcsk-eng/A/actions/runs/41299394624), [41299393214](https://github.com/2503140kcsk-eng/A/actions/runs/41299393214), and [41299390204](https://github.com/2503140kcsk-eng/A/actions/runs/41299390204).
+- Documentation-only commits after `8d777022` did not modify Lean source, lakefile, manifest, toolchain, script, or workflow. The above pinned build therefore checks the current compiled source tree.
+
+### Independent computations and prior work
+- Re-ran Wolfram exact simplification for both point-spike and non-degenerate separated-signal mixtures. The point-spike expressions reduce to mean `5/8`, variance `3/32 + 3 s^2/5`, and forward KL `log(5/3)`. The separated-signal expressions reduce to mean `5/8`, variance `11/224 + 3 s^2/7`, and forward KL `log(7/3)`.
+- Rechecked the primary HTML of Zhang, arXiv:2610.26116v1 (19 October 2026). Its Theorem 5.1 / Section 5 already gives the deterministic one-improvement adaptation obstruction and its Corollary 5.5 gives an `Omega((T/A)^(1/4))` loss against supplied-budget deterministic oracle rates. The general unknown-budget low-noise schedule remains open in Section 6.
+- Parallel Search and Sider Scholar also surfaced prior work on variation budgets and change detection, including Besbes–Gur–Zeevi, Auer–Gajane–Ortner, Garivier–Moulines, and later adaptive tracking work. Gap counting, coupling-until-detection, Jensen averaging, and probe/commit monitoring are not claimed as new techniques.
+
+### Current status — do not overclaim
+- **CI:** the compiled Lean target and finite regression script pass.
+- **Kernel-verified:** published-frontier algebraic corollary; positive-noise scalar moments/budgets/KL expression and Mathlib one-round adapters; finite PMFs, their measure-based moments, and discrete finite KL sum.
+- **Not kernel-verified:** equality of the discrete PMF KL with Mathlib's measure-level `InformationTheory.klDiv`; arbitrary-history finite-horizon KL induction; the path-counting lower proof; the family-specific policy expected-regret theorem; and the final restricted-family oracle ratio proof.
+- **Research status:** the point-spike restricted-family upper/lower result and the non-degenerate support-separated extension remain written mathematical arguments. The latter is not formalized in Lean. Neither is a solution to the unrestricted unknown-`(Q,B)` problem; publication-level novelty remains unverified.
+- PR #2 remains Draft and must not be merged as a complete formal solution.
