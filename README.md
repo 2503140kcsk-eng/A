@@ -28,7 +28,7 @@ r_1\geq \frac{gu}{12},
 u^2=nq,\quad u\geq4,\quad n\leq u.
 ]
 
-<badge> <badge label="Lean CI passed" /> </badge>
+**Lean CI: PASS** — pinned Lean/Mathlib build completed with `--wfail`.
 
 The pinned Lean/Mathlib build passed with `--wfail` in [GitHub Actions run 41281044362](https://github.com/2503140kcsk-eng/A/actions/runs/41281044362), on code/workflow commit `e9e90b8b5c7393352c00de7f27ac91d95ada7f7d`. The subsequent branch commits changed research documents only; the Lean source, Lake files, toolchain, and workflow used by that run are unchanged.
 
