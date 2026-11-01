@@ -86,3 +86,35 @@ Added exact moment/KL calculations, alternative-budget counterexample searches u
 
 Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019), Chen–Lee–Luo–Wei (COLT 2019), and Wei–Luo (COLT 2021) give prior-free results in related stochastic, contextual, and RL settings. The new target remains the two-positive-noise-budget selected-arm family relative to the Zhang (2026) supplied-\((Q,B)\) oracle benchmark, with full-model novelty still provisional.
 
+
+
+## 2026-11-01 — finite PMFs, exact regression tests, and measure-KL bridge work
+
+### Finite PMFs and moments
+- Added BudgetFreeBandits/PositiveNoisePMF.lean.
+- Constructs the point-spike baseline and alternative as actual PMF (Fin 3) values with masses (1/2,1/2,0) and (3/10,3/10,2/5).
+- Defines expectation and variance as integrals against PMF.toMeasure, proves the finite weighted-sum identities, and kernel-checks exact means, variances, and the discrete KL log-sum.
+- **Verified:** pinned Lean v4.36.0-rc2 --wfail builds at [41288057061](https://github.com/2503140kcsk-eng/A/actions/runs/41288057061) and [41288061567](https://github.com/2503140kcsk-eng/A/actions/runs/41288061567), commit 3db509402e407a59d14648648659b262d85
+
+### Independent exact regression test
+- Added scripts/independent_checks.py using only Python standard-library Fraction, random, and itertools.
+- It enumerates 200 history-dependent randomized policies on horizons 1–5, sharing the same policy kernel in the baseline and alternative. It checks exact transcript likelihood ratios (5/3)^N_a on 53,516 baseline transcripts.
+- It exhaustively checks 2,046 pull-time subsets for gap-counting and Cauchy–Schwarz with q<=10.
+- It checks 13,231 exact rational (T,tau) pairs for both point-spike and separated-signal variance budgets.
+- The checker is run before Lean by .github/workflows/lean.yml. An initial checker run exposed a bug: it sampled separate action kernels in the two environments. The script was corrected to share the policy probability table, and the next workflow's independent-check step passed.
+- **Evidence limit:** all these tests are finite regression checks; they do not establish a universal theorem over arbitrary horizons or policy kernels.
+
+### Measure-level KL bridge — still in progress
+- Added BudgetFreeBandits/PositiveNoiseMeasureKL.lean to connect the discrete PMF KL expression to Mathlib's actual InformationTheory.klDiv, using Measure.withDensity, Radon–Nikodym derivatives, and Mathlib's klDiv_eq_lintegral_klFun_of_ac.
+- The first CI attempts exposed missing imports, the need for an explicit discrete measurable space, and incorrect namespace/argument syntax. The current draft has been revised to use named baseline/alternative measures and explicit constructors.
+- **Not yet verified:** do not treat spike_measure_kl_exact as a Lean theorem until the current pinned workflow passes. If it remains unstable, quarantine the module from the root import rather than weaken it with sorry or axioms.
+
+### Finite-history KL induction — still a draft
+- BudgetFreeBandits/SequentialKL.lean is not imported by BudgetFreeBandits.lean.
+- It attempts to iterate Mathlib's klDiv_compProd_eq_add over recursively defined action/reward histories, but prior CI attempts exposed dependent-history measurable-space and recursion/elaboration issues.
+- **Not verified:** this is not a completed all-history adaptive KL proof. The next formalization should first establish a small finite-horizon theorem for a fixed history type and explicit joint transition kernels, then generalize by induction.
+
+### Research and PR state
+- The arXiv 2610.26116v1 record and related prior-work sources were rechecked. Gap-counting, coupling-until-detection, Jensen averaging, and probe/commit monitoring are not claimed as new techniques. The current candidate extension is only to positive-variance finite distributions with a perfectly separating signal event.
+- The non-degenerate separated-signal construction remains a mathematical note and has not yet been formalized in Lean.
+- PR #2 has been returned to **Draft** to match its own acceptance criteria. It is not ready to merge.
