@@ -20,6 +20,9 @@ open scoped ENNReal
 
 namespace BudgetFreeBandits
 
+/-- Finite outcome space with its discrete sigma-algebra. -/
+local instance : MeasurableSpace (Fin 3) := ⊤
+
 /-- The Radon--Nikodym density of the baseline law with respect to the
 alternative law: 5/3 on baseline support and 0 on the marker. -/
 def spikeDensity (i : Fin 3) : ℝ≥0∞ :=
