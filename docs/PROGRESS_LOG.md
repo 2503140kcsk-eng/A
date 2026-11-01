@@ -94,7 +94,7 @@ Unknown-change adaptation alone is not novel: Auer–Gajane–Ortner (COLT 2019)
 - Added BudgetFreeBandits/PositiveNoisePMF.lean.
 - Constructs the point-spike baseline and alternative as actual PMF (Fin 3) values with masses (1/2,1/2,0) and (3/10,3/10,2/5).
 - Defines expectation and variance as integrals against PMF.toMeasure, proves the finite weighted-sum identities, and kernel-checks exact means, variances, and the discrete KL log-sum.
-- **Verified:** pinned Lean v4.36.0-rc2 --wfail builds at [41288057061](https://github.com/2503140kcsk-eng/A/actions/runs/41288057061) and [41288061567](https://github.com/2503140kcsk-eng/A/actions/runs/41288061567), commit 3db509402e407a59d14648648659b262d85
+- **Verified:** pinned Lean v4.36.0-rc2 --wfail builds at [41288057061](https://github.com/2503140kcsk-eng/A/actions/runs/41288057061) and [41288061567](https://github.com/2503140kcsk-eng/A/actions/runs/41288061567), commit 3db509402e407a59d146486b45067980d89982a0
 
 ### Independent exact regression test
 - Added scripts/independent_checks.py using only Python standard-library Fraction, random, and itertools.
