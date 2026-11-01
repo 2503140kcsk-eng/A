@@ -227,3 +227,20 @@ It does not remove the separability promise. For overlapping supports, the signa
 - Exact arithmetic is suitable for SymPy/Wolfram verification.
 - SageMath, cvc5, and GAP are assigned finite-policy enumeration, SMT counterexample search, and symmetry reduction respectively; they are not reported as executed unless a corresponding run log is committed.
 - The formal finite-history induction, gap-sum/Jensen proof, and complete algorithm expected-regret theorem remain separate Lean obligations.
+
+
+## 9. Novelty audit against the October 2026 literature
+
+A primary-source comparison is now recorded after reading the full arXiv v1 text of [Xiaojin Zhang, *Variance-Aware Non-Stationary Bandits: All-Budget Regret Bounds and Adaptation Costs*, arXiv:2610.26116v1 (19 October 2026)](https://arxiv.org/abs/2610.26116).
+
+That paper already proves the gap-counting/Jensen adaptation obstruction on a disclosed **deterministic** one-improvement family, gives a matching family-specific monitoring policy, and derives a competitive-ratio lower bound of order \(\Omega((T/A)^{1/4})\) relative to supplied-budget deterministic oracle rates. It explicitly says that general unknown-budget low-noise scheduling remains open. Therefore:
+- gap counting, coupling until detection, Jensen averaging, and probe/commit monitoring are **not** claimed as new techniques here;
+- the broad unknown-budget problem is not solved by this note;
+- the present construction's distinct mathematical extension is to a disclosed finite family with strictly positive reward variance at every arm and time, including a genuinely non-degenerate signal law with a perfectly separating event;
+- the resulting restricted-family exponent \(\Theta((T/A)^{1/6})\) is a proved claim on that constructed family only, and is weaker than the deterministic-family \((T/A)^{1/4}\) exponent in the cited paper. The two exponents have different oracle denominators / environment classes and should not be compared as if they were the same minimax problem.
+
+The same paper characterizes all supplied \((Q,B)\) minimax rates up to a logarithmic factor in the noisy setting, but does not claim a matching unrestricted unknown-budget policy. The exact overlap with the present project is the open adaptation question and the use of an oblivious one-improvement family; the positive-variance separated-signal mixture is an explicit subproblem extension, not a resolution of the open question.
+
+Further established ingredients include adversarial variation-adaptive bandits without a known variation budget (Karnin–Anava, NeurIPS 2016) and adaptive partial-observation quickest-change detection with information-theoretic delay bounds (Gopalan et al., NeurIPS 2021). These sources further prevent claiming generic novelty for unknown-variation adaptation or adaptive sensing/change detection. See [Karnin–Anava](https://papers.nips.cc/paper/6341-multi-armed-bandits-competing-with-optimal-sequences) and [Gopalan et al.](https://proceedings.neurips.cc/paper/2021/hash/f3a4ff4839c56a5f460c88cce3666a2b-Abstract.html).
+
+**Novelty status:** unverified. The positive-variance distributional specialization may be worth retaining as a formally checked example, but publication-level originality requires a separate systematic search and expert review.
