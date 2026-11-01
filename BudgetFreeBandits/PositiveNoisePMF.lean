@@ -26,7 +26,9 @@ def spikeBasePMF : PMF (Fin 3) :=
   PMF.ofFintype
     (fun i => if i = 2 then 0 else (1 / 2 : ℝ≥0∞))
     (by
-      norm_num [Fin.sum_univ_succ]
+      rw [Fin.sum_univ_succ]
+      simp only [Fin.zero_eta, Fin.succ_zero_eq_one, Fin.succ_one_eq_two, if_pos, if_neg]
+      norm_num
     )
 
 /-- Alternative law: contaminate the baseline by mass 2/5 on the marker. -/
@@ -34,7 +36,9 @@ def spikeAlternativePMF : PMF (Fin 3) :=
   PMF.ofFintype
     (fun i => if i = 2 then (2 / 5 : ℝ≥0∞) else (3 / 10 : ℝ≥0∞))
     (by
-      norm_num [Fin.sum_univ_succ]
+      rw [Fin.sum_univ_succ]
+      simp only [Fin.zero_eta, Fin.succ_zero_eq_one, Fin.succ_one_eq_two, if_pos, if_neg]
+      norm_num [ENNReal.div_eq_mul_inv]
     )
 
 @[simp] theorem spikeBasePMF_zero :
