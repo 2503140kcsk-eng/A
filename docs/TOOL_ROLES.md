@@ -45,3 +45,29 @@ This project uses free/open-source mathematical tools where they genuinely help.
 The plan assumes no paid model APIs, paid computation, paid storage, or proprietary solver; no paid hosted Sage/notebook requirement; reproducible local or free CI execution; and pinned versions where feasible.
 
 The upstream repositories are dependencies or reference tools only. This project has no write permission to those upstream repositories; project code and proof artifacts are committed to 2503140kcsk-eng/A.
+
+
+## Execution record for the 1 November 2026 research pass
+
+The following roles were actually exercised in this pass:
+
+| Component | Actual use in this pass | Evidence / limit |
+|---|---|---|
+| GitHub connector | Read PR #2, repository source, pinned toolchain, prior CI, and committed the new PMF source plus research note. | Commits and Actions run URLs are recorded in the conversation and repository history. |
+| GitHub Actions / Lean | Attempted the pinned Lean v4.36.0-rc2 build with --wfail; initial PMF implementation exposed syntax and ENNReal normalization errors and is being iteratively repaired. | A failed build is not a proof pass. The new PMF module must not be described as verified until a later head commit passes. |
+| Context7 | Resolved the Mathlib library and queried finite PMF construction / expectation APIs. | API discovery only. The pinned source at v4.36.0-rc2 was also read directly. |
+| Sider Scholar | Searched prior variance-adaptive bandit and change-detection literature. | Search result quality was mixed; no novelty conclusion is inferred from ranking alone. |
+| Parallel Search | Cross-checked arXiv and primary conference sources, including bandit quickest changepoint detection. | Related work confirms adaptive sensing/detection is known; it does not settle this exact restricted regret ratio. |
+| Wolfram | Recomputed exact means, variances, KL and searched for violations of the original variance-budget bounds. | Symbolic checks are independent sanity checks, not formal proofs. |
+| Python / SymPy | Exact-rational sweeps for the non-degenerate separated-signal variance budgets; enumerated randomized finite-history policies for horizons 1–5 and checked the transcript likelihood-ratio/count identity. | The transcript experiment covered 200 randomly generated history-dependent policy kernels; it is not a universal theorem. |
+
+The following requested repositories were assigned roles but their standalone executables were **not available in the execution environment**, so no run is claimed:
+
+- SageMath: exact LP and finite policy-game enumeration.
+- cvc5: SMT search over finite rational counterexamples.
+- GAP: arm-symmetry group/orbit reduction.
+- Macaulay2: not needed for the present finite probability / information-theory argument; reserve it for a later algebraic-geometry reduction.
+- LeanDojo-v2: theorem/source retrieval and proof-premise exploration only; not used as a proof checker here.
+- Naproche: independent prose-proof checking; not run.
+
+No paid API, paid notebook, hosted proprietary solver, deployment, or external project write was used. A user-specific GitHub Actions quota/billing allowance was not observable here; users should check their account's current Actions allowance before relying on repeated CI runs.
