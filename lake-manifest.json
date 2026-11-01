@@ -111,7 +111,7 @@
       "configFile": "lakefile.toml"
     }
   ],
-  "name": "budget-free-bandits",
+  "name": "budgetFreeBandits",
   "lakeDir": ".lake",
   "fixedToolchain": true
 }
