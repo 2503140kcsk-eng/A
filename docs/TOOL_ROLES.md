@@ -49,25 +49,25 @@ The upstream repositories are dependencies or reference tools only. This project
 
 ## Execution record for the 1 November 2026 research pass
 
-The following roles were actually exercised in this pass:
-
-| Component | Actual use in this pass | Evidence / limit |
+| Component | Actually exercised | Evidence boundary |
 |---|---|---|
-| GitHub connector | Read PR #2, repository source, pinned toolchain, prior CI, and committed the new PMF source plus research note. | Commits and Actions run URLs are recorded in the conversation and repository history. |
-| GitHub Actions / Lean | Attempted the pinned Lean v4.36.0-rc2 build with --wfail; initial PMF implementation exposed syntax and ENNReal normalization errors and is being iteratively repaired. | A failed build is not a proof pass. The new PMF module must not be described as verified until a later head commit passes. |
-| Context7 | Resolved the Mathlib library and queried finite PMF construction / expectation APIs. | API discovery only. The pinned source at v4.36.0-rc2 was also read directly. |
-| Sider Scholar | Searched prior variance-adaptive bandit and change-detection literature. | Search result quality was mixed; no novelty conclusion is inferred from ranking alone. |
-| Parallel Search | Cross-checked arXiv and primary conference sources, including bandit quickest changepoint detection. | Related work confirms adaptive sensing/detection is known; it does not settle this exact restricted regret ratio. |
-| Wolfram | Recomputed exact means, variances, KL and searched for violations of the original variance-budget bounds. | Symbolic checks are independent sanity checks, not formal proofs. |
-| Python / SymPy | Exact-rational sweeps for the non-degenerate separated-signal variance budgets; enumerated randomized finite-history policies for horizons 1–5 and checked the transcript likelihood-ratio/count identity. | The transcript experiment covered 200 randomly generated history-dependent policy kernels; it is not a universal theorem. |
+| GitHub connector | Re-read PR #2, all core Lean files, project workflow, and research notes; committed PMF, measure-KL bridge draft, exact-check script, and workflow changes. | Git commits and Actions runs are visible in the branch history. |
+| GitHub Actions / Lean | Verified the PMF module in earlier pinned v4.36.0-rc2 --wfail runs. The newer measure-level KL bridge is being built separately; it is not called verified until its current workflow passes. | See the live Actions run linked from PR #2. |
+| Context7 | Resolved Mathlib4 and queried the finite-PMF integration API. | API discovery only; the exact pinned Mathlib source was also inspected. |
+| Wolfram | Evaluated exact mean, variance and KL expressions for the point-spike family; also checked variance-envelope bounds symbolically. | Symbolic checks validate the supplied algebra, not the bandit probability proof. |
+| Python standard library | Ran exact-rational budget sweeps; enumerated 200 history-adaptive randomized policy kernels for horizons 1–5; checked 53,516 baseline transcripts; exhaustively checked 2,046 pull subsets for gap-counting with q <= 10. | This is a finite independent regression test, not a universal theorem. Reproduction: python3 scripts/independent_checks.py. |
+| Parallel Search | Retrieved primary-source abstracts for the 19 October 2026 paper and established change-detection / variation-adaptation prior work. | Literature discovery, not proof verification. |
+| Sider Scholar | Retrieved the exact arXiv record/abstract for arXiv:2610.26116 and searched related nonstationary-bandit work. | The search is not an exhaustive novelty proof. |
 
-The following requested repositories were assigned roles but their standalone executables were **not available in the execution environment**, so no run is claimed:
+The following user-supplied repositories have **assigned roles but were not executed as standalone tools in this environment**:
 
-- SageMath: exact LP and finite policy-game enumeration.
-- cvc5: SMT search over finite rational counterexamples.
-- GAP: arm-symmetry group/orbit reduction.
-- Macaulay2: not needed for the present finite probability / information-theory argument; reserve it for a later algebraic-geometry reduction.
-- LeanDojo-v2: theorem/source retrieval and proof-premise exploration only; not used as a proof checker here.
-- Naproche: independent prose-proof checking; not run.
+- **SymPy:** exact symbolic simplification; not run in this pass (the reproducible checker uses Python Fraction instead).
+- **SageMath:** exact LP and finite policy-game enumeration; not run.
+- **cvc5:** SMT counterexample search; not run.
+- **GAP:** arm-symmetry/orbit reduction; not run.
+- **Macaulay2:** algebraic-geometric elimination if a polynomial-ideal reduction appears; not needed for the present finite probability construction and not run.
+- **LeanDojo-v2:** theorem/source retrieval and premise search; not run as a proof checker.
+- **Naproche:** prose-proof checking; not run.
+- **Mathlib4:** used through pinned Lean CI and direct source inspection.
 
-No paid API, paid notebook, hosted proprietary solver, deployment, or external project write was used. A user-specific GitHub Actions quota/billing allowance was not observable here; users should check their account's current Actions allowance before relying on repeated CI runs.
+No paid API, hosted Sage notebook, commercial solver, paid compute, or deployment was used. GitHub Actions account quota/remaining minutes were not observable; the workflow uses the repository's standard hosted CI.
