@@ -39,8 +39,8 @@ def spikeDensity (i : Fin 3) : ℝ≥0∞ :=
 
 /-- The baseline measure is the alternative measure weighted by spikeDensity. -/
 theorem spikeBase_toMeasure_eq_withDensity :
-    spikeAlternativePMF.toMeasure.withDensity spikeDensity =
-      spikeBasePMF.toMeasure := by
+    Measure.withDensity (PMF.toMeasure spikeAlternativePMF) spikeDensity =
+      PMF.toMeasure spikeBasePMF := by
   classical
   apply Measure.ext
   intro s hs
@@ -53,50 +53,50 @@ theorem spikeBase_toMeasure_eq_withDensity :
 
 /-- The baseline measure is absolutely continuous with respect to the alternative. -/
 theorem spikeBase_toMeasure_absolutelyContinuous :
-    spikeBasePMF.toMeasure ≪ spikeAlternativePMF.toMeasure := by
+    PMF.toMeasure spikeBasePMF ≪ PMF.toMeasure spikeAlternativePMF := by
   rw [← spikeBase_toMeasure_eq_withDensity]
   exact Measure.withDensity_absolutelyContinuous _ _
 
 /-- The Radon--Nikodym derivative is exactly 5/3 on the baseline support and 0
 on the marker, almost everywhere under the alternative law. -/
 theorem spikeBase_rnDeriv_eq_density :
-    (spikeBasePMF.toMeasure).rnDeriv (spikeAlternativePMF.toMeasure)
-      =ᵐ[spikeAlternativePMF.toMeasure] spikeDensity := by
+    (PMF.toMeasure spikeBasePMF).rnDeriv (PMF.toMeasure spikeAlternativePMF)
+      =ᵐ[PMF.toMeasure spikeAlternativePMF] spikeDensity := by
   rw [← spikeBase_toMeasure_eq_withDensity]
-  have htop : ∀ᵐ i ∂spikeAlternativePMF.toMeasure, spikeDensity i ≠ ∞ :=
+  have htop : ∀ᵐ i ∂PMF.toMeasure spikeAlternativePMF, spikeDensity i ≠ ∞ :=
     ae_of_all _ (by intro i; fin_cases i <;> simp [spikeDensity])
   have h := Measure.rnDeriv_withDensity_left
-    (μ := spikeAlternativePMF.toMeasure)
-    (ν := spikeAlternativePMF.toMeasure)
+    (μ := PMF.toMeasure spikeAlternativePMF)
+    (ν := PMF.toMeasure spikeAlternativePMF)
     (f := spikeDensity)
     (by fun_prop)
     htop
-  filter_upwards [h, Measure.rnDeriv_self spikeAlternativePMF.toMeasure] with i hi hs
+  filter_upwards [h, Measure.rnDeriv_self PMF.toMeasure spikeAlternativePMF] with i hi hs
   rw [hi, hs]
   simp
 
 /-- Actual measure-theoretic KL, as defined by Mathlib, is the exact log(5/3). -/
 theorem spike_measure_kl_exact :
-    InformationTheory.klDiv spikeBasePMF.toMeasure spikeAlternativePMF.toMeasure =
+    InformationTheory.klDiv PMF.toMeasure spikeBasePMF PMF.toMeasure spikeAlternativePMF =
       ENNReal.ofReal (Real.log (5 / 3)) := by
   rw [InformationTheory.klDiv_eq_lintegral_klFun_of_ac
     spikeBase_toMeasure_absolutelyContinuous]
   calc
     (∫⁻ i, ENNReal.ofReal
         (InformationTheory.klFun
-          ((spikeBasePMF.toMeasure).rnDeriv
-            (spikeAlternativePMF.toMeasure) i).toReal)
-        ∂spikeAlternativePMF.toMeasure)
+          ((PMF.toMeasure spikeBasePMF).rnDeriv
+            (PMF.toMeasure spikeAlternativePMF) i).toReal)
+        ∂PMF.toMeasure spikeAlternativePMF)
       =
       ∫⁻ i, ENNReal.ofReal
         (InformationTheory.klFun (spikeDensity i).toReal)
-        ∂spikeAlternativePMF.toMeasure := by
+        ∂PMF.toMeasure spikeAlternativePMF := by
           refine lintegral_congr_ae ?_
           filter_upwards [spikeBase_rnDeriv_eq_density] with i hi
           rw [hi]
     _ = ∑ i, ENNReal.ofReal
         (InformationTheory.klFun (spikeDensity i).toReal) *
-          spikeAlternativePMF.toMeasure {i} := by
+          PMF.toMeasure spikeAlternativePMF {i} := by
           rw [lintegral_fintype]
     _ = ENNReal.ofReal (Real.log (5 / 3)) := by
           simp [spikeDensity, spikeAlternativePMF,
@@ -106,8 +106,8 @@ theorem spike_measure_kl_exact :
 
 /-- The real-valued KL obtained from Mathlib's measure KL is log(5/3). -/
 theorem spike_measure_kl_toReal_exact :
-    (InformationTheory.klDiv spikeBasePMF.toMeasure
-      spikeAlternativePMF.toMeasure).toReal = Real.log (5 / 3) := by
+    (InformationTheory.klDiv PMF.toMeasure spikeBasePMF
+      PMF.toMeasure spikeAlternativePMF).toReal = Real.log (5 / 3) := by
   rw [spike_measure_kl_exact, ENNReal.toReal_ofReal]
   exact Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 5 / 3)
 
