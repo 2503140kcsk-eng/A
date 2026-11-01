@@ -51,9 +51,9 @@ The upstream repositories are dependencies or reference tools only. This project
 
 | Component | Actually exercised in this pass | Evidence boundary |
 |---|---|---|
-| GitHub connector | Read PR #2 and branch sources; updated the root import graph; archived two failing proof drafts without deleting their contents; updated README, progress, and research documentation. | Mutations are visible in branch commits; the PR remains Draft. |
-| GitHub Actions / Lean | Ran pinned Lean v4.36.0-rc2 builds. The finite PMF module had earlier passing `--wfail` runs; recent builds exposed that two incomplete Lean files were part of Lake's default module build even though they were not imported by the root. They are now archived as Markdown drafts and removed from the compiled source tree. | Current branch-head CI passed both independent checks and pinned Lean/Mathlib build in run 41299670148 for commit a16ee752b4fd5b66a22af33a78941b1efab6faed. Four later commits after source cleanup were documentation-only. |
-| Mathlib4 | Used the pinned Mathlib APIs in the core Lean files and inspected pinned source for `PMF.toMeasure`, `toMeasure_apply`, Radon–Nikodym and KL declarations. | Only declarations in the three compiled source modules count as verified. The measure-level KL and sequential-history inductions are not in the compiled source. |
+| GitHub connector | Read PR #2 and branch sources; archived the failed measure-KL attempt; reworked and verified the finite-history sequential KL chain rule; added it to the root import graph; updated README, progress, and research documentation. | Mutations are visible in branch commits; the PR remains Draft. |
+| GitHub Actions / Lean | Pinned Lean v4.36.0-rc2 / Mathlib v4.36.0-rc2 build with `--wfail`. The first sequential-history draft failed on a type-reduction issue; a second recursive-measurable-space formulation passed, and the verified module is imported from the root. The measure-level KL bridge remains archived. | Runs 41300592276 and 41300588286 both passed exact finite checks and Lean build on source commit 8e7ae0dc10024ac0b7289dd397ea0a1a27324a37. |
+| Mathlib4 | Used pinned PMF, integral, measure, Markov-kernel, and KL chain-rule APIs; inspected exact pinned source for `PMF.toMeasure`, `klDiv_compProd_eq_add`, and common-kernel cancellation. | Four compiled modules contain the verified declarations. The PMF-to-measure KL bridge remains unverified. |
 | Context7 | Resolved Mathlib4 and queried finite PMF integration, `PMF.toMeasure`, `rnDeriv`, `withDensity`, and KL APIs. | Context7's retrieved examples include current `master`; version-sensitive names were cross-checked against the exact pinned v4.36.0-rc2 source. |
 | Wolfram | Evaluated exact point-spike and separated-signal means, variances, and forward KL expressions. | It checked supplied algebra: point-spike mean `5/8`, variance `3/32 + 3 s^2/5`, KL `log(5/3)`; separated-signal mean `5/8`, variance `11/224 + 3 s^2/7`, KL `log(7/3)`. It does not prove the probability or adaptation arguments. |
 | Parallel Search | Retrieved the 19 October 2026 arXiv paper's primary HTML and searched for prior work on variation budgets, bandit adaptation, and change detection. | Source discovery and theorem-scope comparison only. |
@@ -77,7 +77,17 @@ No paid API, paid hosted notebook, commercial solver, paid compute, or deploymen
 
 ## Current acceptance boundary
 
-- The compiled Lean library contains only `AdaptationFrontier.lean`, `PositiveNoiseAdaptation.lean`, and `PositiveNoisePMF.lean`, reachable from `BudgetFreeBandits.lean`.
-- `PositiveNoiseMeasureKL.lean` and `SequentialKL.lean` are archived under `docs/drafts/` as noncompiled Markdown. Their contents are preserved; their theorem statements are not verified.
-- The full finite-history KL identity, path-counting lower proof, policy expected-regret proof, and final restricted ratio comparison remain mathematical write-ups rather than end-to-end kernel-checked theorems.
-- The PR must remain Draft until those proofs are formalized and independently reviewed for novelty.
+- The compiled Lean library imports `AdaptationFrontier.lean`, `PositiveNoiseAdaptation.lean`, `PositiveNoisePMF.lean`, and `SequentialKL.lean` through `BudgetFreeBandits.lean`.
+- `SequentialKL.lean` kernel-checks the generic finite-horizon adaptive KL chain rule for recursive complete histories and arbitrary Markov transition kernels.
+- `PositiveNoiseMeasureKL.lean` remains archived as `docs/drafts/PositiveNoiseMeasureKL.lean.md`; it has not yet connected the finite discrete KL to Mathlib's measure-level KL.
+- The concrete point-spike specialization of the all-history KL identity, path-counting lower proof, policy expected-regret proof, and final restricted ratio comparison remain written arguments rather than end-to-end kernel-checked theorems.
+- The PR must remain Draft until those remaining probability/regret arguments are formalized and independently reviewed for novelty.
+
+## Additional formalization completed — finite-horizon adaptive KL
+
+`BudgetFreeBandits/SequentialKL.lean` is now part of the compiled root library. It defines the complete history recursively and makes the history measurable spaces explicit, so the composition-product history type is definitionally the next-round history type. It proves:
+- every transcript generated by a sequence of Markov kernels is a probability measure;
+- the conditional one-round KL cost at time t, evaluated under the baseline history law;
+- the finite-horizon identity expressing full transcript KL as the finite sum of those local conditional KL costs.
+
+The proof is checked by Lean's kernel under pinned Mathlib and uses `InformationTheory.klDiv_compProd_eq_add`. The transition kernels may depend on the entire previous history. The earlier failed source attempt is preserved as an archived draft but has been superseded by this verified module.
