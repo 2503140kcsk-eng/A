@@ -3,6 +3,8 @@ module
 public import Mathlib
 public import Mathlib.InformationTheory.KullbackLeibler.ChainRule
 
+@[expose] public section
+
 /-!
 # Finite-horizon KL chain rule for adaptive sequential experiments
 
