@@ -21,6 +21,7 @@ theorem pointSpike_gap_triangle_lower
       (∑ i ∈ gaps, gap i ^ 2) / 2 ≤
         ∑ i ∈ gaps, gap i * (gap i + 1) / 2 := by
     rw [← Finset.sum_div]
+    apply (div_le_div_right (by norm_num : (0 : ℝ) < 2)).2
     apply Finset.sum_le_sum
     intro i hi
     have hnonneg := hgap i hi
@@ -72,11 +73,9 @@ theorem pointSpike_arm_gap_average_lower
     simp
   have hSbound : n * q / 2 ≤ S := by
     rw [hsumS]
-    dsimp [M] at hpulls_half
     nlinarith [hpulls_half, mul_nonneg (le_of_lt hn) (le_of_lt hq)]
   have hDupper : D ≤ r0 / gap + n := by
     rw [hsumD]
-    dsimp [M] at hpulls_budget
     exact add_le_add_right hpulls_budget n
   have hDpos : 0 < D := by
     rw [hsumD]
@@ -95,8 +94,9 @@ theorem pointSpike_arm_gap_average_lower
       (by
         intro i hi
         linarith [hpulls_nonneg i hi])
-  have hCS : S ^ 2 ≤ D * R :=
-    (div_le_iff₀ hDpos).mp hTitu
+  have hCS : S ^ 2 ≤ D * R := by
+    have htmp := (div_le_iff₀ hDpos).mp hTitu
+    simpa [mul_comm] using htmp
   have hnum : 0 ≤ n * q / 2 := by positivity
   have hnumSq : (n * q / 2) ^ 2 ≤ S ^ 2 := by
     nlinarith [hSbound]
@@ -105,8 +105,9 @@ theorem pointSpike_arm_gap_average_lower
   have hkey : (n * q / 2) ^ 2 ≤ (r0 / gap + n) * R :=
     le_trans hnumSq (le_trans hCS hDR)
   have hRlower :
-      (n * q / 2) ^ 2 / (r0 / gap + n) ≤ R :=
-    (div_le_iff₀ hUpos).2 hkey
+      (n * q / 2) ^ 2 / (r0 / gap + n) ≤ R := by
+    apply (div_le_iff₀ hUpos).2
+    simpa [mul_comm] using hkey
   have hcoef : 0 ≤ gap / (2 * q * n) := by positivity
   have hscaled := mul_le_mul_of_nonneg_left hRlower hcoef
   have hden : 0 < r0 + gap * n := by positivity
@@ -118,9 +119,6 @@ theorem pointSpike_arm_gap_average_lower
     <;> ring
   rw [← halgebra]
   exact hscaled
-
-end BudgetFreeBandits
-
 
 /--
 Finite weighted Jensen step for the convex gap function
@@ -226,3 +224,5 @@ theorem pointSpike_gap_reward_lower
         mul_le_mul_of_nonneg_left hdiv (by positivity)
     _ ≤ scale * (∑ i ∈ gaps, gap i * (gap i + 1) / 2) :=
       htriangle
+
+end BudgetFreeBandits
