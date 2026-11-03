@@ -5,3 +5,4 @@ public import BudgetFreeBandits.PositiveNoiseAdaptation
 public import BudgetFreeBandits.PositiveNoisePMF
 public import BudgetFreeBandits.SequentialKL
 public import BudgetFreeBandits.PointSpikeLocalKL
+public import BudgetFreeBandits.PointSpikeGapAlgebra
