@@ -197,3 +197,32 @@ theorem pointSpike_weighted_gap_jensen
               linarith [hpulls_nonneg i hi])
             field_simp [hw, hp]
             <;> ring
+
+
+/--
+Combines the gap-square Cauchy--Schwarz estimate with the triangular
+within-gap regret sum. For m target pulls there are m+1 gaps, and their
+total length is q-m.
+-/
+theorem pointSpike_gap_reward_lower
+    {ι : Type*} (gaps : Finset ι) (gap : ι → ℝ)
+    (m q scale : ℝ)
+    (hm : 0 ≤ m) (hscale : 0 ≤ scale)
+    (hcard : (gaps.card : ℝ) = m + 1)
+    (hsum : (∑ i ∈ gaps, gap i) = q - m)
+    (hgap : ∀ i ∈ gaps, 0 ≤ gap i) :
+    scale / 2 * ((q - m) ^ 2 / (m + 1)) ≤
+      scale * (∑ i ∈ gaps, gap i * (gap i + 1) / 2) := by
+  have hmpos : 0 < m + 1 := by linarith
+  have hsq := pointSpike_gap_square_lower gaps gap m q hcard hsum
+  have hdiv : (q - m) ^ 2 / (m + 1) ≤
+      (∑ i ∈ gaps, gap i ^ 2) :=
+    (div_le_iff₀ hmpos).2 hsq
+  have htriangle :=
+    pointSpike_gap_triangle_lower gaps gap scale hscale hgap
+  calc
+    scale / 2 * ((q - m) ^ 2 / (m + 1))
+      ≤ scale / 2 * (∑ i ∈ gaps, gap i ^ 2) :=
+        mul_le_mul_of_nonneg_left hdiv (by positivity)
+    _ ≤ scale * (∑ i ∈ gaps, gap i * (gap i + 1) / 2) :=
+      htriangle
