@@ -120,3 +120,80 @@ theorem pointSpike_arm_gap_average_lower
   exact hscaled
 
 end BudgetFreeBandits
+
+
+/--
+Finite weighted Jensen step for the convex gap function
+f(x) = (q - x)^2 / (x + 1).  The proof uses the weighted form of Titu's
+lemma. Histories with zero probability are excluded from the finite support;
+the weights on the supplied support are strictly positive and sum to one.
+-/
+theorem pointSpike_weighted_gap_jensen
+    {ι : Type*} (histories : Finset ι)
+    (weight pulls : ι → ℝ) (q : ℝ)
+    (hweight_pos : ∀ i ∈ histories, 0 < weight i)
+    (hweight_sum : (∑ i ∈ histories, weight i) = 1)
+    (hpulls_nonneg : ∀ i ∈ histories, 0 ≤ pulls i) :
+    (q - (∑ i ∈ histories, weight i * pulls i)) ^ 2 /
+        (1 + (∑ i ∈ histories, weight i * pulls i)) ≤
+      ∑ i ∈ histories,
+        weight i * ((q - pulls i) ^ 2 / (pulls i + 1)) := by
+  have hden_term : ∀ i ∈ histories, 0 < weight i * (pulls i + 1) := by
+    intro i hi
+    exact mul_pos (hweight_pos i hi) (by linarith [hpulls_nonneg i hi])
+  have hTitu :
+      (∑ i ∈ histories, weight i * (q - pulls i)) ^ 2 /
+          (∑ i ∈ histories, weight i * (pulls i + 1)) ≤
+        ∑ i ∈ histories,
+          (weight i * (q - pulls i)) ^ 2 /
+            (weight i * (pulls i + 1)) :=
+    Finset.sq_sum_div_le_sum_sq_div histories
+      (fun i => weight i * (q - pulls i)) hden_term
+  have hnum :
+      (∑ i ∈ histories, weight i * (q - pulls i)) =
+        q - (∑ i ∈ histories, weight i * pulls i) := by
+    calc
+      (∑ i ∈ histories, weight i * (q - pulls i))
+        = ∑ i ∈ histories, (weight i * q - weight i * pulls i) := by
+          apply Finset.sum_congr rfl
+          intro i hi
+          ring
+      _ = (∑ i ∈ histories, weight i * q) -
+            (∑ i ∈ histories, weight i * pulls i) := by
+          rw [Finset.sum_sub_distrib]
+      _ = q - (∑ i ∈ histories, weight i * pulls i) := by
+          rw [← Finset.sum_mul, hweight_sum]
+          ring
+  have hden :
+      (∑ i ∈ histories, weight i * (pulls i + 1)) =
+        1 + (∑ i ∈ histories, weight i * pulls i) := by
+    calc
+      (∑ i ∈ histories, weight i * (pulls i + 1))
+        = ∑ i ∈ histories, (weight i * pulls i + weight i) := by
+          apply Finset.sum_congr rfl
+          intro i hi
+          ring
+      _ = (∑ i ∈ histories, weight i * pulls i) +
+            (∑ i ∈ histories, weight i) := by
+          rw [Finset.sum_add_distrib]
+      _ = 1 + (∑ i ∈ histories, weight i * pulls i) := by
+          rw [hweight_sum]
+          ring
+  calc
+    (q - (∑ i ∈ histories, weight i * pulls i)) ^ 2 /
+        (1 + (∑ i ∈ histories, weight i * pulls i))
+      = (∑ i ∈ histories, weight i * (q - pulls i)) ^ 2 /
+          (∑ i ∈ histories, weight i * (pulls i + 1)) := by
+            rw [← hnum, ← hden]
+    _ ≤ ∑ i ∈ histories,
+          (weight i * (q - pulls i)) ^ 2 /
+            (weight i * (pulls i + 1)) := hTitu
+    _ = ∑ i ∈ histories,
+          weight i * ((q - pulls i) ^ 2 / (pulls i + 1)) := by
+            apply Finset.sum_congr rfl
+            intro i hi
+            have hw : weight i ≠ 0 := ne_of_gt (hweight_pos i hi)
+            have hp : pulls i + 1 ≠ 0 := ne_of_gt (by
+              linarith [hpulls_nonneg i hi])
+            field_simp [hw, hp]
+            <;> ring
