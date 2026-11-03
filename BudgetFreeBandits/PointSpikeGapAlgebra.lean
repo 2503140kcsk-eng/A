@@ -21,11 +21,12 @@ theorem pointSpike_gap_triangle_lower
       (∑ i ∈ gaps, gap i ^ 2) / 2 ≤
         ∑ i ∈ gaps, gap i * (gap i + 1) / 2 := by
     rw [← Finset.sum_div]
-    apply (div_le_div_right (by norm_num : (0 : ℝ) < 2)).2
-    apply Finset.sum_le_sum
-    intro i hi
-    have hnonneg := hgap i hi
-    nlinarith [sq_nonneg (gap i)]
+    apply div_le_div_of_nonneg_right
+    · apply Finset.sum_le_sum
+      intro i hi
+      have hnonneg := hgap i hi
+      nlinarith [sq_nonneg (gap i)]
+    · norm_num
   calc
     scale / 2 * (∑ i ∈ gaps, gap i ^ 2)
       = scale * ((∑ i ∈ gaps, gap i ^ 2) / 2) := by ring
@@ -76,7 +77,7 @@ theorem pointSpike_arm_gap_average_lower
     nlinarith [hpulls_half, mul_nonneg (le_of_lt hn) (le_of_lt hq)]
   have hDupper : D ≤ r0 / gap + n := by
     rw [hsumD]
-    exact add_le_add_right hpulls_budget n
+    simpa [add_comm] using add_le_add_right hpulls_budget n
   have hDpos : 0 < D := by
     rw [hsumD]
     linarith
@@ -213,8 +214,9 @@ theorem pointSpike_gap_reward_lower
   have hmpos : 0 < m + 1 := by linarith
   have hsq := pointSpike_gap_square_lower gaps gap m q hcard hsum
   have hdiv : (q - m) ^ 2 / (m + 1) ≤
-      (∑ i ∈ gaps, gap i ^ 2) :=
-    (div_le_iff₀ hmpos).2 hsq
+      (∑ i ∈ gaps, gap i ^ 2) := by
+    apply (div_le_iff₀ hmpos).2
+    simpa [mul_comm] using hsq
   have htriangle :=
     pointSpike_gap_triangle_lower gaps gap scale hscale hgap
   calc
