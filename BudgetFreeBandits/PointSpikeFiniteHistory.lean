@@ -12,6 +12,7 @@ namespace BudgetFreeBandits
 
 
 /-- Every recursively generated finite action/reward history is a finite type. -/
+@[instance_reducible]
 private def pointSpikeHistoryFintype (A X : Type*) [Fintype A] [Fintype X] :
     (t : ℕ) → Fintype (SequentialHistory A X t)
   | 0 => by
@@ -55,7 +56,7 @@ theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
   classical
   letI := pointSpikeHistoryFintype (Fin A) (Fin 3)
   simp [pointSpikeTranscriptPMF, PMF.bind_apply, PMF.map_apply,
-    tsum_fintype, eq_comm, mul_assoc]
+    tsum_fintype, Prod.mk.injEq, Finset.sum_ite_eq', eq_comm, mul_assoc]
 
 /-- The baseline reward law, independent of action and time. -/
 def pointSpikeBaselineReward {A : ℕ} :
