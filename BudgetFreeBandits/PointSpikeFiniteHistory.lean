@@ -41,8 +41,8 @@ private theorem pointSpikeRewardMap_apply {A : ℕ} (t : ℕ)
     by_cases ha : a' = a
     · subst a'
       simp [PMF.map_apply, tsum_fintype]
-    · simp [PMF.map_apply, ha, eq_comm, Prod.mk.injEq, tsum_fintype]
-  · simp [PMF.map_apply, hh, eq_comm, Prod.mk.injEq, tsum_fintype]
+    · simp [PMF.map_apply, ha.symm, Prod.mk.injEq, tsum_fintype]
+  · simp [PMF.map_apply, hh.symm, Prod.mk.injEq, tsum_fintype]
 
 /--
 Exact one-path probability recursion. The probability of extending a
@@ -67,9 +67,9 @@ theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
   · rw [tsum_eq_single a]
     · simp [mul_assoc]
     · intro a' ha
-      simp [ha, eq_comm]
+      simp [ha]
   · intro h' hh
-    simp [hh, eq_comm]
+    simp [hh]
 
 /-- The baseline reward law, independent of action and time. -/
 def pointSpikeBaselineReward {A : ℕ} :
