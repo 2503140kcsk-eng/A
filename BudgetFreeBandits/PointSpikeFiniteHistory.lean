@@ -273,7 +273,6 @@ theorem pointSpikeTranscript_toReal_likelihood_ratio {A : ℕ}
             ((spikeBasePMF x).toReal /
               (pointSpikeAlternativeReward target tau t a x).toReal) := by
                 field_simp [hprevReal, hpolicyReal, hrewardAltReal]
-                <;> ring
         _ =
           (5 / 3 : ℝ) ^ pointSpikePullCount target tau t hprev *
             ((spikeBasePMF x).toReal /
