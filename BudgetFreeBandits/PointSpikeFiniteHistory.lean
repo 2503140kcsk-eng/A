@@ -123,8 +123,6 @@ theorem pointSpike_reward_likelihood_ratio {A : ℕ}
   · simp [pointSpikeAlternativeReward, hchange]
     fin_cases x <;> norm_num [spikeBasePMF, spikeAlternativePMF] at *
 
-end BudgetFreeBandits
-
 /-- Baseline finite-history mass recurrence. -/
 theorem pointSpikeBaseTranscriptPMF_apply_succ {A : ℕ}
     (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
