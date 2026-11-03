@@ -194,7 +194,6 @@ theorem pointSpike_weighted_gap_jensen
             have hp : pulls i + 1 ≠ 0 := ne_of_gt (by
               linarith [hpulls_nonneg i hi])
             field_simp [hw, hp]
-            <;> ring
 
 
 /--
