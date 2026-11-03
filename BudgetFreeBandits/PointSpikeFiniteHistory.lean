@@ -350,7 +350,7 @@ theorem pointSpikeTranscriptDiscreteKL_eq_log_mul_expected_pulls {A : ℕ}
           · simp [hbase]
           · have hratio :=
               pointSpikeTranscript_toReal_likelihood_ratio policy target tau t h hbase
-            simp only [if_neg hbase]
+            simp only [ite_eq_right hbase]
             rw [hratio, Real.log_pow]
             ring
     _ =
