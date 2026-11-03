@@ -117,7 +117,7 @@ theorem pointSpike_arm_gap_average_lower
         gap ^ 2 * n * q / (8 * (r0 + gap * n)) := by
     field_simp [ne_of_gt hq, ne_of_gt hn, ne_of_gt hgap,
       ne_of_gt hUpos, ne_of_gt hden]
-    <;> ring
+    ; ring
   rw [← halgebra]
   exact hscaled
 
