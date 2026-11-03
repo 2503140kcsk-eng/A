@@ -124,3 +124,61 @@ theorem pointSpike_reward_likelihood_ratio {A : ℕ}
     fin_cases x <;> norm_num [spikeBasePMF, spikeAlternativePMF] at *
 
 end BudgetFreeBandits
+
+/-- Baseline finite-history mass recurrence. -/
+theorem pointSpikeBaseTranscriptPMF_apply_succ {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (t : ℕ) (h : SequentialHistory (Fin A) (Fin 3) t)
+    (a : Fin A) (x : Fin 3) :
+    pointSpikeBaseTranscriptPMF policy (t + 1) (h, (a, x)) =
+      pointSpikeBaseTranscriptPMF policy t h * policy t h a * spikeBasePMF x := by
+  simpa [pointSpikeBaseTranscriptPMF, pointSpikeBaselineReward] using
+    (pointSpikeTranscriptPMF_apply_succ policy pointSpikeBaselineReward t h a x)
+
+/-- Alternative finite-history mass recurrence. -/
+theorem pointSpikeAltTranscriptPMF_apply_succ {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau t : ℕ)
+    (h : SequentialHistory (Fin A) (Fin 3) t)
+    (a : Fin A) (x : Fin 3) :
+    pointSpikeAltTranscriptPMF policy target tau (t + 1) (h, (a, x)) =
+      pointSpikeAltTranscriptPMF policy target tau t h *
+        policy t h a * pointSpikeAlternativeReward target tau t a x := by
+  simpa [pointSpikeAltTranscriptPMF] using
+    (pointSpikeTranscriptPMF_apply_succ policy
+      (pointSpikeAlternativeReward target tau) t h a x)
+
+/-- Positive alternative probability on every baseline-supported finite transcript. -/
+theorem pointSpikeAltTranscriptPMF_pos_of_base
+    {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau : ℕ) :
+    ∀ t (h : SequentialHistory (Fin A) (Fin 3) t),
+      pointSpikeBaseTranscriptPMF policy t h ≠ 0 →
+        pointSpikeAltTranscriptPMF policy target tau t h ≠ 0 := by
+  intro t
+  induction t with
+  | zero =>
+      intro h hbase
+      simp [pointSpikeBaseTranscriptPMF, pointSpikeAltTranscriptPMF,
+        pointSpikeTranscriptPMF] at hbase ⊢
+  | succ t ih =>
+      intro h
+      rcases h with ⟨hprev, a, x⟩
+      intro hbase
+      rw [pointSpikeBaseTranscriptPMF_apply_succ] at hbase
+      have hbaseFactors := hbase
+      simp only [mul_eq_zero, not_or] at hbaseFactors
+      rcases hbaseFactors with ⟨hbasePrev, hpolicy, hreward⟩
+      have haltPrev := ih hprev hbasePrev
+      have haltReward :
+          pointSpikeAlternativeReward target tau t a x ≠ 0 := by
+        by_cases hchange : tau ≤ t + 1 ∧ a = target
+        · simpa [pointSpikeAlternativeReward, hchange] using
+            (spike_alternative_positive_on_base_support x hreward)
+        · simpa [pointSpikeAlternativeReward, hchange] using hreward
+      rw [pointSpikeAltTranscriptPMF_apply_succ]
+      exact mul_ne_zero (mul_ne_zero haltPrev hpolicy) haltReward
+
+
+end BudgetFreeBandits
