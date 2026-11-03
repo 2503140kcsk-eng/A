@@ -214,10 +214,11 @@ theorem pointSpikeTranscript_toReal_likelihood_ratio {A : ℕ}
   induction t with
   | zero =>
       intro h hbase
-      change (PMF.pure PUnit.unit h).toReal /
-        (PMF.pure PUnit.unit h).toReal =
-          (5 / 3 : ℝ) ^ (0 : ℕ)
-      simp
+      have hh : h = PUnit.unit := by
+        simpa [pointSpikeBaseTranscriptPMF, pointSpikeTranscriptPMF] using hbase
+      subst h
+      simp [pointSpikeBaseTranscriptPMF, pointSpikeAltTranscriptPMF,
+        pointSpikeTranscriptPMF, pointSpikePullCount]
   | succ t ih =>
       intro h
       rcases h with ⟨hprev, a, x⟩
