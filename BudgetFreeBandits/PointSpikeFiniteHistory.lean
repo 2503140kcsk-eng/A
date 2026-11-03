@@ -286,4 +286,83 @@ theorem pointSpikeTranscript_toReal_likelihood_ratio {A : ℕ}
                 · simp [pointSpikePullCount, hchange]
 
 
+
+/-- Finite action/reward histories inherit a computable finite type. -/
+@[instance_reducible]
+private def pointSpikeHistoryFintype (A X : Type*) [Fintype A] [Fintype X] :
+    (t : ℕ) → Fintype (SequentialHistory A X t)
+  | 0 => by
+      change Fintype PUnit
+      infer_instance
+  | t + 1 => by
+      letI := pointSpikeHistoryFintype A X t
+      change Fintype (SequentialHistory A X t × (A × X))
+      infer_instance
+
+private instance instPointSpikeHistoryFintype {A : ℕ} (t : ℕ) :
+    Fintype (SequentialHistory (Fin A) (Fin 3) t) :=
+  pointSpikeHistoryFintype (Fin A) (Fin 3) t
+
+/-- Expected number of post-change pulls of the target action under the baseline. -/
+def pointSpikeExpectedPullCount {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau t : ℕ) : ℝ :=
+  ∑ h : SequentialHistory (Fin A) (Fin 3) t,
+    (pointSpikeBaseTranscriptPMF policy t h).toReal *
+      (pointSpikePullCount target tau t h : ℝ)
+
+/-- Discrete KL divergence of two finite transcript PMFs, with 0 log(0/q)=0. -/
+def pointSpikeTranscriptDiscreteKL {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau t : ℕ) : ℝ :=
+  ∑ h : SequentialHistory (Fin A) (Fin 3) t,
+    if pointSpikeBaseTranscriptPMF policy t h = 0 then 0 else
+      (pointSpikeBaseTranscriptPMF policy t h).toReal *
+        Real.log ((pointSpikeBaseTranscriptPMF policy t h).toReal /
+          (pointSpikeAltTranscriptPMF policy target tau t h).toReal)
+
+/--
+The exact finite-transcript discrete KL equals log(5/3) times the expected
+number of post-change pulls of the target arm. This is the finite-sum
+specialization of the path likelihood-ratio identity; it does not yet
+identify the discrete sum with Mathlib's measure-level KL divergence.
+-/
+theorem pointSpikeTranscriptDiscreteKL_eq_log_mul_expected_pulls {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau t : ℕ) :
+    pointSpikeTranscriptDiscreteKL policy target tau t =
+      Real.log (5 / 3) * pointSpikeExpectedPullCount policy target tau t := by
+  classical
+  unfold pointSpikeTranscriptDiscreteKL pointSpikeExpectedPullCount
+  calc
+    (∑ h : SequentialHistory (Fin A) (Fin 3) t,
+        if pointSpikeBaseTranscriptPMF policy t h = 0 then 0 else
+          (pointSpikeBaseTranscriptPMF policy t h).toReal *
+            Real.log ((pointSpikeBaseTranscriptPMF policy t h).toReal /
+              (pointSpikeAltTranscriptPMF policy target tau t h).toReal))
+      =
+    ∑ h : SequentialHistory (Fin A) (Fin 3) t,
+      ((pointSpikeBaseTranscriptPMF policy t h).toReal *
+        (pointSpikePullCount target tau t h : ℝ)) * Real.log (5 / 3) := by
+          apply Finset.sum_congr rfl
+          intro h hh
+          by_cases hbase : pointSpikeBaseTranscriptPMF policy t h = 0
+          · simp [hbase]
+          · have hratio :=
+              pointSpikeTranscript_toReal_likelihood_ratio policy target tau t h hbase
+            simp only [if_neg hbase]
+            rw [hratio, Real.log_pow]
+            ring
+    _ =
+      (∑ h : SequentialHistory (Fin A) (Fin 3) t,
+        (pointSpikeBaseTranscriptPMF policy t h).toReal *
+          (pointSpikePullCount target tau t h : ℝ)) * Real.log (5 / 3) := by
+            rw [Finset.sum_mul]
+    _ =
+      Real.log (5 / 3) *
+        (∑ h : SequentialHistory (Fin A) (Fin 3) t,
+          (pointSpikeBaseTranscriptPMF policy t h).toReal *
+            (pointSpikePullCount target tau t h : ℝ)) := by ring
+
+
 end BudgetFreeBandits
