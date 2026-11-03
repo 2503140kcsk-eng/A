@@ -1,6 +1,7 @@
 module
 
 public import BudgetFreeBandits.PointSpikeGapAlgebra
+public import BudgetFreeBandits.SequentialKL
 public import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 noncomputable section
