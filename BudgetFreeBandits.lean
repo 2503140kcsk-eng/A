@@ -8,3 +8,4 @@ public import BudgetFreeBandits.PointSpikeLocalKL
 public import BudgetFreeBandits.PointSpikeGapAlgebra
 public import BudgetFreeBandits.PointSpikeFiniteHistory
 public import BudgetFreeBandits.PointSpikeMeasureKL
+public import BudgetFreeBandits.PointSpikeTranscriptMeasureKL
