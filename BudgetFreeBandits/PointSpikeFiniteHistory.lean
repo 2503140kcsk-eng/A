@@ -189,4 +189,101 @@ theorem pointSpikeAltTranscriptPMF_pos_of_base
       exact mul_ne_zero (mul_ne_zero haltPrev hpolicy) haltReward
 
 
+
+/-- A nonzero mass of a PMF has nonzero real value. -/
+private theorem pointSpikePMF_toReal_ne_zero {α : Type*}
+    (p : PMF α) (x : α) (hp : p x ≠ 0) :
+    (p x).toReal ≠ 0 := by
+  exact ENNReal.toReal_ne_zero.mpr ⟨hp, p.apply_ne_top x⟩
+
+/--
+The likelihood ratio of a complete finite transcript is exactly
+(5/3) to the number of post-change pulls of the target arm.
+The same history-dependent policy is used under both environments, so
+its action probability cancels at each recursion step.
+-/
+theorem pointSpikeTranscript_toReal_likelihood_ratio {A : ℕ}
+    (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
+    (target : Fin A) (tau : ℕ) :
+    ∀ t (h : SequentialHistory (Fin A) (Fin 3) t),
+      pointSpikeBaseTranscriptPMF policy t h ≠ 0 →
+        (pointSpikeBaseTranscriptPMF policy t h).toReal /
+          (pointSpikeAltTranscriptPMF policy target tau t h).toReal =
+            (5 / 3 : ℝ) ^ pointSpikePullCount target tau t h := by
+  intro t
+  induction t with
+  | zero =>
+      intro h hbase
+      change (PMF.pure PUnit.unit h).toReal /
+        (PMF.pure PUnit.unit h).toReal =
+          (5 / 3 : ℝ) ^ (0 : ℕ)
+      simp
+  | succ t ih =>
+      intro h
+      rcases h with ⟨hprev, a, x⟩
+      intro hbase
+      rw [pointSpikeBaseTranscriptPMF_apply_succ] at hbase
+      have hbasePrev :
+          pointSpikeBaseTranscriptPMF policy t hprev ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
+      have hpolicy : policy t hprev a ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
+      have hreward : spikeBasePMF x ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
+      have haltPrev :
+          pointSpikeAltTranscriptPMF policy target tau t hprev ≠ 0 :=
+        pointSpikeAltTranscriptPMF_pos_of_base policy target tau t hprev hbasePrev
+      have haltReward :
+          pointSpikeAlternativeReward target tau t a x ≠ 0 := by
+        by_cases hchange : tau ≤ t + 1 ∧ a = target
+        · simpa [pointSpikeAlternativeReward, hchange] using
+            (spike_alternative_positive_on_base_support x hreward)
+        · simpa [pointSpikeAlternativeReward, hchange] using hreward
+      have hprevReal :
+          (pointSpikeAltTranscriptPMF policy target tau t hprev).toReal ≠ 0 :=
+        pointSpikePMF_toReal_ne_zero _ _ haltPrev
+      have hpolicyReal : (policy t hprev a).toReal ≠ 0 :=
+        pointSpikePMF_toReal_ne_zero _ _ hpolicy
+      have hrewardAltReal :
+          (pointSpikeAlternativeReward target tau t a x).toReal ≠ 0 :=
+        pointSpikePMF_toReal_ne_zero _ _ haltReward
+      calc
+        (pointSpikeBaseTranscriptPMF policy (t + 1) (hprev, (a, x))).toReal /
+            (pointSpikeAltTranscriptPMF policy target tau (t + 1)
+              (hprev, (a, x))).toReal
+          =
+          ((pointSpikeBaseTranscriptPMF policy t hprev).toReal *
+              (policy t hprev a).toReal * (spikeBasePMF x).toReal) /
+            ((pointSpikeAltTranscriptPMF policy target tau t hprev).toReal *
+              (policy t hprev a).toReal *
+              (pointSpikeAlternativeReward target tau t a x).toReal) := by
+                rw [pointSpikeBaseTranscriptPMF_apply_succ,
+                  pointSpikeAltTranscriptPMF_apply_succ]
+                simp only [ENNReal.toReal_mul]
+        _ =
+          ((pointSpikeBaseTranscriptPMF policy t hprev).toReal /
+              (pointSpikeAltTranscriptPMF policy target tau t hprev).toReal) *
+            ((spikeBasePMF x).toReal /
+              (pointSpikeAlternativeReward target tau t a x).toReal) := by
+                field_simp [hprevReal, hpolicyReal, hrewardAltReal]
+                <;> ring
+        _ =
+          (5 / 3 : ℝ) ^ pointSpikePullCount target tau t hprev *
+            ((spikeBasePMF x).toReal /
+              (pointSpikeAlternativeReward target tau t a x).toReal) := by
+                rw [ih hprev hbasePrev]
+        _ = (5 / 3 : ℝ) ^ pointSpikePullCount target tau (t + 1)
+              (hprev, (a, x)) := by
+                rw [pointSpike_reward_likelihood_ratio target tau t a x hreward]
+                by_cases hchange : tau ≤ t + 1 ∧ a = target
+                · simp [pointSpikePullCount, hchange, pow_succ, mul_comm]
+                · simp [pointSpikePullCount, hchange]
+
+
 end BudgetFreeBandits
