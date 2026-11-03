@@ -26,13 +26,10 @@ def pointSpikeTranscriptPMF {A : ℕ}
         (policy t h).bind fun a =>
           (reward t a).map fun x => (h, (a, x))
 
-/--
-Exact one-path probability recursion. The probability of extending a
-history by action a and reward x is the old history probability times the
-policy's conditional action probability times the selected reward mass.
--/
 /-- A finite reward PMF mapped into the fixed history/action prefix. -/
-private theorem pointSpikeRewardMap_apply {A : ℕ}
+private theorem pointSpikeRewardMap_apply {A : ℕ} (t : ℕ)
+    [DecidableEq (SequentialHistory (Fin A) (Fin 3) t)]
+    [DecidableEq (Fin A)]
     (reward : Fin A → PMF (Fin 3))
     (h h' : SequentialHistory (Fin A) (Fin 3) t)
     (a a' : Fin A) (x : Fin 3) :
@@ -44,8 +41,8 @@ private theorem pointSpikeRewardMap_apply {A : ℕ}
     by_cases ha : a' = a
     · subst a'
       simp [PMF.map_apply, tsum_fintype]
-    · simp [PMF.map_apply, ha, Prod.mk.injEq, tsum_fintype]
-  · simp [PMF.map_apply, hh, Prod.mk.injEq, tsum_fintype]
+    · simp [PMF.map_apply, ha, eq_comm, Prod.mk.injEq, tsum_fintype]
+  · simp [PMF.map_apply, hh, eq_comm, Prod.mk.injEq, tsum_fintype]
 
 /--
 Exact one-path probability recursion. The probability of extending a
@@ -70,9 +67,9 @@ theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
   · rw [tsum_eq_single a]
     · simp [mul_assoc]
     · intro a' ha
-      simp [ha]
+      simp [ha, eq_comm]
   · intro h' hh
-    simp [hh]
+    simp [hh, eq_comm]
 
 /-- The baseline reward law, independent of action and time. -/
 def pointSpikeBaselineReward {A : ℕ} :
