@@ -39,11 +39,19 @@ def spikeDensity (i : Fin 3) : ℝ≥0∞ :=
 theorem spikeDensity_mul_alternative_eq_base (i : Fin 3) :
     spikeDensity i * spikeAlternativePMF i = spikeBasePMF i := by
   have h53 : ENNReal.ofReal (5 / 3 : ℝ) = (5 / 3 : ℝ≥0∞) := by
-    norm_num [ENNReal.ofReal, Real.toNNReal]
+    rw [ENNReal.ofReal_eq_coe_nnreal (by norm_num)]
+    rw [← ENNReal.coe_div (by norm_num : (3 : ℝ≥0) ≠ 0)]
+    congr 1
+    ext
+    norm_num
+  have hratNN : (5 / 3 : ℝ≥0) * (3 / 10 : ℝ≥0) = (1 / 2 : ℝ≥0) := by
+    norm_num
   have hrat : (5 / 3 : ℝ≥0∞) * (3 / 10 : ℝ≥0∞) =
       (1 / 2 : ℝ≥0∞) := by
-    exact_mod_cast
-      (show (5 / 3 : ℝ≥0) * (3 / 10 : ℝ≥0) = (1 / 2 : ℝ≥0) by norm_num)
+    rw [← ENNReal.coe_div (by norm_num : (3 : ℝ≥0) ≠ 0),
+      ← ENNReal.coe_div (by norm_num : (10 : ℝ≥0) ≠ 0),
+      ← ENNReal.coe_div (by norm_num : (2 : ℝ≥0) ≠ 0)]
+    norm_cast
   fin_cases i <;>
     simp [spikeDensity, spikeAlternativePMF, spikeBasePMF, h53, hrat]
 
@@ -110,8 +118,7 @@ theorem spike_measure_kl_toReal_exact :
     spikeBase_toMeasure_absolutelyContinuous hEq]
   rw [integral_congr_ae spikeBase_llr_eq_log_density_ae]
   rw [PMF.integral_eq_sum]
-  simp [spikeBasePMF, spikeDensity, ENNReal.toReal_ofReal,
-    mul_comm, mul_left_comm, mul_assoc]
+  norm_num [spikeBasePMF, spikeDensity, ENNReal.toReal_ofReal]
 
 
 end BudgetFreeBandits
