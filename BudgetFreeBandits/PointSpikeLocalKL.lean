@@ -3,6 +3,8 @@ module
 public import BudgetFreeBandits.PositiveNoisePMF
 public import Mathlib.Algebra.Order.Chebyshev
 
+@[expose] public section
+
 /-!
 # Point-spike specialization of the one-step adaptive KL cost
 
