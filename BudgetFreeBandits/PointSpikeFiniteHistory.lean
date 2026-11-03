@@ -6,22 +6,8 @@ public import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 noncomputable section
 
-set_option linter.style.haveILetI false
-
 namespace BudgetFreeBandits
 
-
-/-- Every recursively generated finite action/reward history is a finite type. -/
-@[instance_reducible]
-private def pointSpikeHistoryFintype (A X : Type*) [Fintype A] [Fintype X] :
-    (t : ℕ) → Fintype (SequentialHistory A X t)
-  | 0 => by
-      change Fintype PUnit
-      infer_instance
-  | t + 1 => by
-      letI := pointSpikeHistoryFintype A X t
-      change Fintype (SequentialHistory A X t × (A × X))
-      infer_instance
 
 /-- A one-step finite PMF on the selected action and its observed reward. -/
 def pointSpikeJointStepPMF {A : ℕ}
@@ -45,6 +31,27 @@ Exact one-path probability recursion. The probability of extending a
 history by action a and reward x is the old history probability times the
 policy's conditional action probability times the selected reward mass.
 -/
+/-- A finite reward PMF mapped into the fixed history/action prefix. -/
+private theorem pointSpikeRewardMap_apply {A : ℕ}
+    (reward : Fin A → PMF (Fin 3))
+    (h h' : SequentialHistory (Fin A) (Fin 3) t)
+    (a a' : Fin A) (x : Fin 3) :
+    ((reward a').map fun y => (h', (a', y))) (h, (a, x)) =
+      if h' = h ∧ a' = a then reward a' x else 0 := by
+  classical
+  by_cases hh : h' = h
+  · subst h'
+    by_cases ha : a' = a
+    · subst a'
+      simp [PMF.map_apply, tsum_fintype]
+    · simp [PMF.map_apply, ha, Prod.mk.injEq, tsum_fintype]
+  · simp [PMF.map_apply, hh, Prod.mk.injEq, tsum_fintype]
+
+/--
+Exact one-path probability recursion. The probability of extending a
+history by action a and reward x is the old history probability times the
+policy's conditional action probability times the selected reward mass.
+-/
 theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
     (policy : (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → PMF (Fin A))
     (reward : (t : ℕ) → Fin A → PMF (Fin 3))
@@ -54,9 +61,18 @@ theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
       pointSpikeTranscriptPMF policy reward t h *
         policy t h a * reward t a x := by
   classical
-  letI := pointSpikeHistoryFintype (Fin A) (Fin 3)
-  simp [pointSpikeTranscriptPMF, PMF.bind_apply, PMF.map_apply,
-    tsum_fintype, Prod.mk.injEq, Finset.sum_ite_eq', eq_comm, mul_assoc]
+  change ((pointSpikeTranscriptPMF policy reward t).bind fun h' =>
+      (policy t h').bind fun a' =>
+        (reward t a').map fun y => (h', (a', y))) (h, (a, x)) = _
+  rw [PMF.bind_apply]
+  simp_rw [PMF.bind_apply, pointSpikeRewardMap_apply]
+  rw [tsum_eq_single h]
+  · rw [tsum_eq_single a]
+    · simp [mul_assoc]
+    · intro a' ha
+      simp [ha]
+  · intro h' hh
+    simp [hh]
 
 /-- The baseline reward law, independent of action and time. -/
 def pointSpikeBaselineReward {A : ℕ} :
