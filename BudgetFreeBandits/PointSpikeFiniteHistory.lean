@@ -158,16 +158,26 @@ theorem pointSpikeAltTranscriptPMF_pos_of_base
   induction t with
   | zero =>
       intro h hbase
-      simp [pointSpikeBaseTranscriptPMF, pointSpikeAltTranscriptPMF,
-        pointSpikeTranscriptPMF] at hbase ⊢
+      change (PMF.pure PUnit.unit) h ≠ 0 at hbase ⊢
+      exact hbase
   | succ t ih =>
       intro h
       rcases h with ⟨hprev, a, x⟩
       intro hbase
       rw [pointSpikeBaseTranscriptPMF_apply_succ] at hbase
-      have hbaseFactors := hbase
-      simp only [mul_eq_zero, not_or] at hbaseFactors
-      rcases hbaseFactors with ⟨hbasePrev, hpolicy, hreward⟩
+      have hbasePrev :
+          pointSpikeBaseTranscriptPMF policy t hprev ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
+      have hpolicy : policy t hprev a ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
+      have hreward : spikeBasePMF x ≠ 0 := by
+        intro hz
+        apply hbase
+        simp [hz]
       have haltPrev := ih hprev hbasePrev
       have haltReward :
           pointSpikeAlternativeReward target tau t a x ≠ 0 := by
