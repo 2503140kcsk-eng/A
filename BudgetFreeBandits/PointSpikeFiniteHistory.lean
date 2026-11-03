@@ -6,16 +6,21 @@ public import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 noncomputable section
 
+set_option linter.style.haveILetI false
+
 namespace BudgetFreeBandits
 
 
 /-- Every recursively generated finite action/reward history is a finite type. -/
 private def pointSpikeHistoryFintype (A X : Type*) [Fintype A] [Fintype X] :
     (t : ℕ) → Fintype (SequentialHistory A X t)
-  | 0 => inferInstance
-  | t + 1 =>
+  | 0 => by
+      change Fintype PUnit
+      infer_instance
+  | t + 1 => by
       letI := pointSpikeHistoryFintype A X t
-      inferInstance
+      change Fintype (SequentialHistory A X t × (A × X))
+      infer_instance
 
 /-- A one-step finite PMF on the selected action and its observed reward. -/
 def pointSpikeJointStepPMF {A : ℕ}
