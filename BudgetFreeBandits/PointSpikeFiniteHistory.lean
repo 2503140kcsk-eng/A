@@ -40,7 +40,7 @@ theorem pointSpikeTranscriptPMF_apply_succ {A : ℕ}
         policy t h a * reward t a x := by
   classical
   simp [pointSpikeTranscriptPMF, PMF.bind_apply, PMF.map_apply,
-    eq_comm, mul_assoc]
+    Prod.mk.injEq, eq_comm, mul_assoc]
 
 /-- The baseline reward law, independent of action and time. -/
 def pointSpikeBaselineReward {A : ℕ} :
@@ -53,7 +53,7 @@ def pointSpikeAlternativeReward {A : ℕ}
   fun t a => if tau ≤ t + 1 ∧ a = target then
     spikeAlternativePMF else spikeBasePMF
 
-end BudgetFreeBandits
+namespace BudgetFreeBandits
 
 /-- Number of post-change pulls of the target action along a complete path. -/
 def pointSpikePullCount {A : ℕ} (target : Fin A) (tau : ℕ) :
@@ -100,3 +100,4 @@ theorem pointSpike_reward_likelihood_ratio {A : ℕ}
     · norm_num [spikeBasePMF]
     · simp [spikeBasePMF] at hbase
 
+end BudgetFreeBandits
