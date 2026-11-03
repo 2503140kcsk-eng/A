@@ -38,7 +38,11 @@ def spikeDensity (i : Fin 3) : ℝ≥0∞ :=
 /-- Pointwise density identity on every atom. -/
 theorem spikeDensity_mul_alternative_eq_base (i : Fin 3) :
     spikeDensity i * spikeAlternativePMF i = spikeBasePMF i := by
-  fin_cases i <;> norm_num [spikeDensity, spikeAlternativePMF, spikeBasePMF]
+  have h53 : ENNReal.ofReal (5 / 3 : ℝ) = (5 / 3 : ℝ≥0∞) := by
+    exact ENNReal.ofReal_eq_coe_nnreal (by norm_num)
+  fin_cases i <;>
+    simp [spikeDensity, spikeAlternativePMF, spikeBasePMF, h53] <;>
+    norm_num
 
 /-- The baseline measure is the alternative measure weighted by spikeDensity. -/
 theorem spikeBase_toMeasure_eq_withDensity :
@@ -48,8 +52,7 @@ theorem spikeBase_toMeasure_eq_withDensity :
   intro s hs
   rw [withDensity_apply spikeDensity hs, ← lintegral_indicator hs, lintegral_fintype]
   rw [PMF.toMeasure_apply spikeBasePMF hs]
-  simp only [spikeAlternativeMeasure, PMF.toMeasure_apply_singleton,
-    tsum_fintype, Set.indicator_apply]
+  simp only [spikeAlternativeMeasure, tsum_fintype, Set.indicator_apply]
   apply Finset.sum_congr rfl
   intro i hi
   by_cases his : i ∈ s
@@ -85,61 +88,27 @@ theorem spikeBase_rnDeriv_eq_density :
   rw [hi, hs]
   simp
 
-/-- Actual measure-theoretic KL, as defined by Mathlib, is log(5/3). -/
-theorem spike_measure_kl_exact :
-    InformationTheory.klDiv spikeBaseMeasure spikeAlternativeMeasure =
-      ENNReal.ofReal (Real.log (5 / 3)) := by
-  rw [InformationTheory.klDiv_eq_lintegral_klFun_of_ac
-    spikeBase_toMeasure_absolutelyContinuous]
-  calc
-    (∫⁻ i, ENNReal.ofReal
-        (InformationTheory.klFun
-          (spikeBaseMeasure.rnDeriv spikeAlternativeMeasure i).toReal)
-        ∂spikeAlternativeMeasure)
-      =
-      ∫⁻ i, ENNReal.ofReal
-        (InformationTheory.klFun (spikeDensity i).toReal)
-        ∂spikeAlternativeMeasure := by
-          refine lintegral_congr_ae ?_
-          filter_upwards [spikeBase_rnDeriv_eq_density] with i hi
-          rw [hi]
-    _ = ∑ i, ENNReal.ofReal
-        (InformationTheory.klFun (spikeDensity i).toReal) *
-          spikeAlternativeMeasure {i} := by
-          rw [lintegral_fintype]
-    _ = ENNReal.ofReal (Real.log (5 / 3)) := by
-          simp [spikeAlternativeMeasure, spikeDensity,
-            InformationTheory.klFun, Fin.sum_univ_succ,
-            PMF.toMeasure_apply_singleton]
-          have hA : 0 ≤ (-2 / 3 : ℝ) + Real.log (5 / 3) * (5 / 3) := by
-            have h := InformationTheory.klFun_nonneg
-              (by norm_num : (0 : ℝ) ≤ 5 / 3)
-            norm_num [InformationTheory.klFun] at h
-            nlinarith
-          have hx : 0 ≤ (5 / 3 : ℝ) := by norm_num
-          rw [ENNReal.toReal_ofReal hx]
-          have hcoef :
-              (3 : ℝ≥0∞) / 10 = ENNReal.ofReal ((3 : ℝ) / 10) := by
-            rw [ENNReal.ofReal_eq_coe_nnreal (by norm_num : (0 : ℝ) ≤ 3 / 10)]
-            norm_num
-          have hmark :
-              (2 : ℝ≥0∞) / 5 = ENNReal.ofReal ((2 : ℝ) / 5) := by
-            rw [ENNReal.ofReal_eq_coe_nnreal (by norm_num : (0 : ℝ) ≤ 2 / 5)]
-            norm_num
-          rw [hcoef, hmark, ← ENNReal.ofReal_mul hA,
-            ← ENNReal.ofReal_mul (mul_nonneg hA (by norm_num : (0 : ℝ) ≤ 3 / 10)),
-            ← ENNReal.ofReal_add
-              (mul_nonneg (mul_nonneg hA (by norm_num : (0 : ℝ) ≤ 3 / 10))
-                (by norm_num : (0 : ℝ) ≤ 2))
-              (by norm_num : (0 : ℝ) ≤ 2 / 5)]
-          congr 1
-          ring
+/-- The log-likelihood ratio agrees with the finite density on the baseline support. -/
+theorem spikeBase_llr_eq_log_density_ae :
+    InformationTheory.llr spikeBaseMeasure spikeAlternativeMeasure
+      =ᵐ[spikeBaseMeasure] fun i => Real.log (spikeDensity i).toReal := by
+  filter_upwards [
+    spikeBase_toMeasure_absolutelyContinuous.ae_le spikeBase_rnDeriv_eq_density
+  ] with i hi
+  simp [InformationTheory.llr, hi]
 
-/-- Real-valued KL obtained from Mathlib's measure KL is exactly log(5/3). -/
+/-- The actual measure-theoretic KL, as defined by Mathlib, is log(5/3). -/
 theorem spike_measure_kl_toReal_exact :
     (InformationTheory.klDiv spikeBaseMeasure spikeAlternativeMeasure).toReal =
       Real.log (5 / 3) := by
-  rw [spike_measure_kl_exact, ENNReal.toReal_ofReal]
-  exact Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 5 / 3)
+  have hEq : spikeBaseMeasure univ = spikeAlternativeMeasure univ := by
+    simp [spikeBaseMeasure, spikeAlternativeMeasure]
+  rw [InformationTheory.toReal_klDiv_of_measure_eq
+    spikeBase_toMeasure_absolutelyContinuous hEq]
+  rw [integral_congr_ae spikeBase_llr_eq_log_density_ae]
+  rw [PMF.integral_eq_sum]
+  simp [spikeBasePMF, spikeDensity, ENNReal.toReal_ofReal,
+    mul_comm, mul_left_comm, mul_assoc]
+
 
 end BudgetFreeBandits
