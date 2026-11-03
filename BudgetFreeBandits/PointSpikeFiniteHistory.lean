@@ -63,8 +63,6 @@ def pointSpikeAlternativeReward {A : ℕ}
   fun t a => if tau ≤ t + 1 ∧ a = target then
     spikeAlternativePMF else spikeBasePMF
 
-namespace BudgetFreeBandits
-
 /-- Number of post-change pulls of the target action along a complete path. -/
 def pointSpikePullCount {A : ℕ} (target : Fin A) (tau : ℕ) :
     (t : ℕ) → SequentialHistory (Fin A) (Fin 3) t → ℕ
@@ -99,15 +97,9 @@ theorem pointSpike_reward_likelihood_ratio {A : ℕ}
       if tau ≤ t + 1 ∧ a = target then (5 / 3 : ℝ) else 1 := by
   classical
   by_cases hchange : tau ≤ t + 1 ∧ a = target
-  · simp only [pointSpikeAlternativeReward, if_pos hchange]
-    fin_cases x
-    · norm_num [spikeBasePMF, spikeAlternativePMF]
-    · norm_num [spikeBasePMF, spikeAlternativePMF]
-    · simp [spikeBasePMF] at hbase
-  · simp only [pointSpikeAlternativeReward, if_neg hchange]
-    fin_cases x
-    · norm_num [spikeBasePMF]
-    · norm_num [spikeBasePMF]
-    · simp [spikeBasePMF] at hbase
+  · simp [pointSpikeAlternativeReward, hchange]
+    fin_cases x <;> norm_num [spikeBasePMF, spikeAlternativePMF] at *
+  · simp [pointSpikeAlternativeReward, hchange]
+    fin_cases x <;> norm_num [spikeBasePMF, spikeAlternativePMF] at *
 
 end BudgetFreeBandits
